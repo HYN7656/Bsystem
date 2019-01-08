@@ -28,6 +28,7 @@
 
 <script>
   import md5 from 'js-md5';
+  import Utils from '@/utils/utils2.js'
   export default {
     data() {
       return {
@@ -48,8 +49,8 @@
         } else {
           let params = {};
           params['uName'] = this.userNum;
-          // params['uPasswd'] =md5(this.userNum + this.userPassword);
-          params['uPasswd'] = this.userPassword;
+          params['uPasswd'] =Utils.encrypt(this.userPassword);
+          console.log(params)
           API.post('/user/login', params).then((res) => {
             //console.log(res.data)
             if (res.data.code == 200) {
