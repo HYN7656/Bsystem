@@ -88,10 +88,10 @@
               :data="listMenu"
               show-checkbox
               node-key="id"
-              ref="Tree"
+              ref="Tree2"
               :default-expand-all="true"
               :props="defaultPropsRole"
-              @check-change="handleCheckChange"
+              @check-change="EdithandleCheckChange"
             ></el-tree>
           </el-form-item>
           <el-form-item label="备注">
@@ -262,6 +262,7 @@ export default {
         desc: ""
       },
       menus: "",
+      menus2: "",
       editObject: {
         roleName: "",
         desc: ""
@@ -382,7 +383,12 @@ export default {
       let params = {};
       params["mechanismId"] = this.addObject.umechanism;
       params["roleName"] = this.addObject.roleName;
-      params["menus"] = this.menus.join(",");
+      if(this.menus) {
+        params["menus"] = this.menus.join(",");
+      }else {
+        params["menus"] = '';
+      }
+
       params["desc"] = this.addObject.desc;
       console.log(params)
       API.post("/role/addRole", params, {
@@ -411,6 +417,11 @@ export default {
     // 角色选择
     handleCheckChange(data, checked, indeterminate) {
       this.menus = this.$refs.Tree.getCheckedKeys(false);
+      console.log(this.menus)
+    },
+    EdithandleCheckChange(){
+      this.menus2 = this.$refs.Tree2.getCheckedKeys(false);
+      console.log(this.menus2)
     },
     // 编辑
     editOpen(id) {
@@ -419,7 +430,7 @@ export default {
         roleName: "",
         desc: ""
       };
-      // this.menus = "";
+      this.menus2 = "";
       this.mechanismId = "";
       let params = {};
       params["id"] = id;
@@ -438,7 +449,9 @@ export default {
             for (var i = 0; i < arr.length; i++) {
               arr2.push(parseInt(arr[i]));
             }
-            this.$refs.Tree.setCheckedKeys(arr2);
+            console.log(arr2)
+             this.$refs.Tree2.setCheckedKeys(arr2);
+            this.menus2 = this.$refs.Tree2.getCheckedKeys();
           }
         } else if (res.data.code == 1001) {
           this.signOut();
@@ -453,8 +466,12 @@ export default {
       params["id"] = this.editObject.id;
       params["mechanismId"] = this.mechanismId;
       params["roleName"] = this.editObject.roleName;
-      console.log(this.menus)
-      params["menus"] = this.menus.join(",");
+      if(this.menus2){
+        params["menus"] = this.menus2.join(",");
+      }else {
+        params["menus"] = '';
+      }
+
       params["desc"] = this.editObject.desc;
       console.log(params)
       API.post("/role/updateRole", params, {
