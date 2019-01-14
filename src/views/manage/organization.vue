@@ -249,7 +249,7 @@ export default {
     //加载所有机构和部门
     getTree() {
       let params = {};
-      API.get('/mechanism/findTreeAll', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/mechanism/findTreeAll', params, { Authorization: storage.get('Token') }).then((res) => {
         // console.log(res.data)
         if (res.data.code == 200) {
           var arr = res.data.data;
@@ -273,7 +273,7 @@ export default {
     getAllTreeList(id) {
       let params = {};
       params['id'] = id;
-      API.get('/mechanism/findById', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/mechanism/findById', params, { Authorization: storage.get('Token') }).then((res) => {
         // console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
@@ -294,7 +294,7 @@ export default {
       let params = {};
       params['page'] = this.currentPage;
       params['count'] = this.pageSize;
-      API.get('/mechanism/findAll', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/mechanism/findAll', params, { Authorization: storage.get('Token') }).then((res) => {
         // console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
@@ -356,7 +356,7 @@ export default {
           params['mContent'] = this.addObject.mContent;
 
           // console.log(params)
-          API.post('/mechanism/create', params, { Authorization: storage.get('tokenB') }).then((res) => {
+          API.post('/mechanism/create', params, { Authorization: storage.get('Token') }).then((res) => {
             if (res.data.code == 200) {
               this.addPop = false;
               this.getPage();
@@ -399,7 +399,7 @@ export default {
       this.OrgName = '';
       let params = {};
       params['id'] = id;
-      API.get('/mechanism/findOneById', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/mechanism/findOneById', params, { Authorization: storage.get('Token') }).then((res) => {
         // console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data[0];
@@ -434,7 +434,7 @@ export default {
 
           //console.log(params)
 
-          API.put('/mechanism/update', params, { Authorization: storage.get('tokenB') }).then((res) => {
+          API.put('/mechanism/update', params, { Authorization: storage.get('Token') }).then((res) => {
             //console.log(res.data)
             if (res.data.code == 200) {
               this.editPop = false;
@@ -466,7 +466,7 @@ export default {
       }).then(() => {
         let params = {};
         params['id'] = id;
-        API.delete('/mechanism/delete', params, { Authorization: storage.get('tokenB') }).then((res) => {
+        API.delete('/mechanism/delete', params, { Authorization: storage.get('Token') }).then((res) => {
           if (res.data.code == 200) {
             this.getPage();
             this.$message({
@@ -514,9 +514,9 @@ export default {
         message: '登录失效，请重新登录!'
       });
       // storage.delete('Authorization');
-      storage.delete('authB');
-      storage.delete('tokenB');
-      storage.delete('userB');
+      storage.delete('Auth');
+      storage.delete('Token');
+      storage.delete('User');
       this.$router.push({ name: 'login' })
     }
   },

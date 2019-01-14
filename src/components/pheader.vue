@@ -121,7 +121,7 @@
         settingPop: false,
         choosePop: false,
         activeName: 'first',
-        userName: storage.getJson('userB').uName,
+        userName: storage.getJson('user').uName,
         form: {
           branch: '',
           num: '',
@@ -170,7 +170,7 @@
         }, 1000);
       },
       getAuto() {
-        this.auth = storage.getJson('authB')
+        this.auth = storage.getJson('auth')
         // console.log(this.auth)
         for (var i = 0; i < this.auth.length; i++) {
           if (this.auth[i] == 1) {
@@ -222,10 +222,10 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // storage.delete('Authorization');
-          storage.delete('authB');
-          storage.delete('tokenB');
-          storage.delete('userB');
+          storage.delete('Authorization');
+          storage.delete('auth');
+          storage.delete('token');
+          storage.delete('user');
           this.$message({
             type: 'success',
             message: '您已成功退出!'
@@ -246,10 +246,10 @@
           type: 'error',
           message: '登录失效，请重新登录!'
         });
-        // storage.delete('Authorization');
-        storage.delete('authB');
-        storage.delete('tokenB');
-        storage.delete('userB');
+        storage.delete('Authorization');
+        storage.delete('auth');
+        storage.delete('token');
+        storage.delete('user');
         this.$router.push({name: 'login'})
       }
     },

@@ -72,7 +72,7 @@
         settingPop : true,
         activeName: 'first',
         // edit: false,
-        user:storage.getJson('userB'),
+        user:storage.getJson('User'),
         form : {
           uUsername : '',
           uName : '',

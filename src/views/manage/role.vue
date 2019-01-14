@@ -315,7 +315,7 @@ export default {
       params["page"] = this.currentPage;
       params["count"] = this.pageSize;
       API.get("/role/showRoleList", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
@@ -333,7 +333,7 @@ export default {
     getTree() {
       let params = {};
       API.get("/menu/findMenuList", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
@@ -362,7 +362,7 @@ export default {
     getAffiliate() {
       let params = {};
       API.get("/user/findMechanismAndRole", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
@@ -405,7 +405,7 @@ export default {
       params["desc"] = this.addObject.desc;
       // console.log(params)
       API.post("/role/addRole", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         //console.log(res.data)
         if (res.data.code == 200) {
@@ -470,7 +470,7 @@ export default {
       }
 
       API.get("/role/findRoleById", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
@@ -518,7 +518,7 @@ export default {
       params["desc"] = this.editObject.desc;
       // console.log(params)
       API.post("/role/updateRole", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         //console.log(res.data)
         if (res.data.code == 200) {
@@ -561,7 +561,7 @@ export default {
         let params = {};
         params["id"] = id;
         API.post("/role/del", params, {
-          Authorization: storage.get("tokenB")
+          Authorization: storage.get("Token")
         }).then(res => {
           if (res.data.code == 200) {
             this.getPage();
@@ -597,7 +597,7 @@ export default {
       let params = {};
       params["RoleId"] = id;
       API.get("/user/findByRoleId", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
@@ -626,7 +626,7 @@ export default {
     getTree2() {
       let params = {};
       API.get("/mechanism/findTreeAll", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         // console.log(res.data);
         if (res.data.code == 200) {
@@ -659,7 +659,7 @@ export default {
         params["MechanismId"] = val.id;
         params["userId"] = this.arrXZ.join(",");
         API.get("/user/findUserByMechanismId", params, {
-          Authorization: storage.get("tokenB")
+          Authorization: storage.get("Token")
         }).then(res => {
           // console.log(res.data)
           if (res.data.code == 200) {
@@ -677,7 +677,7 @@ export default {
         params["DepartmentId"] = val.id;
         params["userId"] = this.arrXZ.join(",");
         API.get("/user/findUserByDepartmentId", params, {
-          Authorization: storage.get("tokenB")
+          Authorization: storage.get("Token")
         }).then(res => {
           // console.log(res.data)
           if (res.data.code == 200) {
@@ -731,7 +731,7 @@ export default {
       params["roleId"] = this.roleId;
       //console.log(params)
       API.post("/userRole/create", params, {
-        Authorization: storage.get("tokenB")
+        Authorization: storage.get("Token")
       }).then(res => {
         //console.log(res.data)
         if (res.data.code == 200) {
@@ -788,7 +788,7 @@ export default {
         params["roleId"] = this.roleId;
         //console.log(params)
         API.delete("/userRole/delete", params, {
-          Authorization: storage.get("tokenB")
+          Authorization: storage.get("Token")
         }).then(res => {
           if (res.data.code == 200) {
             this.assignRolePop = true;
@@ -839,9 +839,9 @@ export default {
         message: "登录失效，请重新登录!"
       });
       // storage.delete("Authorization");
-      storage.delete("authB");
-      storage.delete("tokenB");
-      storage.delete("userB");
+      storage.delete("Auth");
+      storage.delete("Token");
+      storage.delete("User");
       this.$router.push({ name: "login" });
     }
   },

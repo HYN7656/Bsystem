@@ -12,7 +12,7 @@
 
 <style lang="less" scoped>
   .p_footer{
-    position: absolute;
+    /*position: absolute;*/
     background-color: #026ab3;
     height: 35px;
     line-height: 35px;

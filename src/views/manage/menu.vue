@@ -273,7 +273,7 @@ export default {
       let params = {};
       params['page'] = this.currentPage;
       params['count'] = this.pageSize;
-      API.get('/menu/findMenuList', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/menu/findMenuList', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
@@ -302,7 +302,7 @@ export default {
     getAllTreeList(id) {
       let params = {};
       params['id'] = id;
-      API.get('/menu/findChildList', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/menu/findChildList', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
@@ -345,7 +345,7 @@ export default {
 
       //console.log(params)
 
-      API.post('/menu/addMenuInfo', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.post('/menu/addMenuInfo', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.addPop = false;
@@ -381,7 +381,7 @@ export default {
       }
       let params = {};
       params['id'] = id;
-      API.get('/menu/findMenuListById', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/menu/findMenuListById', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data.menuInfo;
@@ -409,7 +409,7 @@ export default {
       params['des'] = this.editObject.des;
       //console.log(params)
       // /menu/updateMenuInfo
-      API.post('/menu/updateMenuInfo', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.post('/menu/updateMenuInfo', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.editPop = false;
@@ -477,7 +477,7 @@ export default {
       }).then(() => {
         let params = {};
         params['id'] = id;
-        API.post('/menu/del', params, { Authorization: storage.get('tokenB') }).then((res) => {
+        API.post('/menu/del', params, { Authorization: storage.get('Token') }).then((res) => {
           if (res.data.code == 200) {
             this.getPage();
             this.$message({
@@ -513,10 +513,10 @@ export default {
         type: 'error',
         message: '登录失效，请重新登录!'
       });
-      // storage.delete('Authorization');
-      storage.delete('authB');
-      storage.delete('tokenB');
-      storage.delete('userB');
+      storage.delete('Authorization');
+      storage.delete('Auth');
+      storage.delete('Token');
+      storage.delete('User');
       this.$router.push({ name: 'login' })
     }
   },

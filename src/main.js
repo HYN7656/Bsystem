@@ -38,7 +38,7 @@ router.beforeEach(function (to, from, next) {
   // loadingInstance = Loading.service({ fullscreen: true,background:'rgba(0,0,0,.5)' });
   let meta = to.meta.auth;
   let name = to.name;
-  let token = storage.get('tokenB');
+  let token = storage.get('Token');
   if (name == 'login') {
     next()
     return

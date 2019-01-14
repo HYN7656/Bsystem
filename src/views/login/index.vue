@@ -49,8 +49,8 @@ import { encrypt } from '@/utils/utils.js'
         } else {
           let params = {};
           params['uName'] = this.userNum;
-          // params['uPasswd'] = encrypt(this.userPassword);
-          params['uPasswd'] = this.userPassword;
+          params['uPasswd'] = encrypt(this.userPassword);
+          // params['uPasswd'] = this.userPassword;
           // console.log(params)
           API.post('/user/login', params).then((res) => {
             //console.log(res.data)
@@ -60,10 +60,10 @@ import { encrypt } from '@/utils/utils.js'
                 message: '登录成功!'
               });
               //console.log(res.data.data.token)
-              // storage.set('AuthorizationB', res.data.data.token);
-              storage.set('tokenB', res.data.data.token);
-              storage.setJson('userB', res.data.data.user);
-              storage.setJson('authB', res.data.data.diction);
+              // storage.set('Authorization', res.data.data.token);
+              storage.set('Token', res.data.data.token);
+              storage.setJson('User', res.data.data.user);
+              storage.setJson('Auth', res.data.data.diction);
               this.$router.push({name: 'home'})
             } else {
               this.$message({

@@ -95,7 +95,7 @@ export default {
       let params = {};
       params['page'] = this.currentPage;
       params['count'] = this.pageSize;
-      API.get('/journal/findAll', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/journal/findAll', params, { Authorization: storage.get('Token') }).then((res) => {
         // console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
@@ -125,7 +125,7 @@ export default {
       params['abnormal'] = this.search.normal;
       // console.log(params)
 
-      API.get('/journal/findByCondition', params, { Authorization: storage.get('tokenB') }).then((res) => {
+      API.get('/journal/findByCondition', params, { Authorization: storage.get('Token') }).then((res) => {
         // console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
@@ -158,9 +158,9 @@ export default {
         message: '登录失效，请重新登录!'
       });
       // storage.delete('Authorization');
-      storage.delete('authB');
-      storage.delete('tokenB');
-      storage.delete('userB');
+      storage.delete('Auth');
+      storage.delete('Token');
+      storage.delete('User');
       this.$router.push({ name: 'login' })
     }
   },
