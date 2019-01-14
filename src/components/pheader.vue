@@ -121,7 +121,7 @@
         settingPop: false,
         choosePop: false,
         activeName: 'first',
-        userName: storage.getJson('user').uName,
+        userName: storage.getJson('userB').uName,
         form: {
           branch: '',
           num: '',
@@ -170,8 +170,8 @@
         }, 1000);
       },
       getAuto() {
-        this.auth = storage.getJson('auth')
-        console.log(this.auth)
+        this.auth = storage.getJson('authB')
+        // console.log(this.auth)
         for (var i = 0; i < this.auth.length; i++) {
           if (this.auth[i] == 1) {
             this.userS = true
@@ -222,10 +222,10 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          storage.delete('Authorization');
-          storage.delete('auth');
-          storage.delete('token');
-          storage.delete('user');
+          // storage.delete('Authorization');
+          storage.delete('authB');
+          storage.delete('tokenB');
+          storage.delete('userB');
           this.$message({
             type: 'success',
             message: '您已成功退出!'
@@ -246,10 +246,10 @@
           type: 'error',
           message: '登录失效，请重新登录!'
         });
-        storage.delete('Authorization');
-        storage.delete('auth');
-        storage.delete('token');
-        storage.delete('user');
+        // storage.delete('Authorization');
+        storage.delete('authB');
+        storage.delete('tokenB');
+        storage.delete('userB');
         this.$router.push({name: 'login'})
       }
     },
@@ -344,11 +344,9 @@
     overflow: hidden;
     position: relative;
     zoom: 1;
-    min-height: 800px;
     .p-left {
       width: 16%;
       float: left;
-      min-height: 800px;
       height: 100%;
       background-color: #003b64;
       .p-left-height {

@@ -72,7 +72,7 @@
         settingPop : true,
         activeName: 'first',
         // edit: false,
-        user:storage.getJson('user'),
+        user:storage.getJson('userB'),
         form : {
           uUsername : '',
           uName : '',
@@ -119,7 +119,7 @@
 
 <style lang="less">
   .my-page {
-    min-height: 800px;
+    min-height: 780px;
     background: #fff;
     width: 100%;
     background-color: #F8F8F8;

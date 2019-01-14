@@ -45,6 +45,8 @@ class API {
     config.params = API.sigParams(uri, params);
     if (headers) {
       config.headers = API.sigHeaders(headers)
+    }else{
+      config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     }
     config.url = uri;
     return axios.get(uri, config);
@@ -70,6 +72,8 @@ class API {
     if (headers) {
       config.headers = API.sigHeaders(headers);
       // data = JSON.stringify(params);
+    }else{
+      config.headers['Content-Type'] = 'application/x-www-form-urlencoded;charset=utf-8';
     }
     // console.log(data);
     // config.params=API.sigParams(uri,params);

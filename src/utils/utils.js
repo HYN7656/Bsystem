@@ -1,10 +1,26 @@
 /**
+ * 工具类
+ */
+import Vue from 'vue'
+import CryptoJS from 'crypto-js'
+/**
+ * 加密
+ */
+export function encrypt(word) {
+	var key = CryptoJS.enc.Utf8.parse('2019010817443024');   //加密密钥
+	var iv = CryptoJS.enc.Utf8.parse('2019010817443024');   //加密向量
+	var srcs = CryptoJS.enc.Utf8.parse(word);
+	var encrypted = CryptoJS.AES.encrypt(srcs, key, { iv: iv, mode: CryptoJS.mode.CBC });
+	return encrypted.toString();
+}
+
+/**
  * 字符串加密
  * @param {String} code 
  */
 export function compile(code) {
 	var c = String.fromCharCode(code.charCodeAt(0) - code.length);
-	for(var i = 1; i < code.length; i++) {
+	for (var i = 1; i < code.length; i++) {
 		c += String.fromCharCode(code.charCodeAt(i) + c.charCodeAt(i - 1));
 	}
 	return escape(c);
@@ -17,7 +33,7 @@ export function compile(code) {
 export function uncompile(code) {
 	code = unescape(code);
 	var c = String.fromCharCode(code.charCodeAt(0) + code.length);
-	for(var i = 1; i < code.length; i++) {
+	for (var i = 1; i < code.length; i++) {
 		c += String.fromCharCode(code.charCodeAt(i) - code.charCodeAt(i - 1));
 	}
 	return c;

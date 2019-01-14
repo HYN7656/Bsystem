@@ -1,22 +1,19 @@
 <template>
   <div class="org-page">
     <div class="left cell">
-      <div class="title">
-        组织机构
-      </div>
+      <div class="title">组织机构</div>
       <div class="content">
         <el-tree
           :data="listOrg"
           :props="defaultProps"
           @node-click="handleNodeClick"
           :expand-on-click-node="false"
-          :default-expand-all="true"></el-tree>
+          :default-expand-all="true"
+        ></el-tree>
       </div>
     </div>
     <div class="right cell">
-      <div class="title">
-        机构列表
-      </div>
+      <div class="title">机构列表</div>
       <div class="content">
         <el-row :gutter="20">
           <el-col :span="4" class="flex btn">
@@ -24,37 +21,13 @@
           </el-col>
         </el-row>
         <div class="result-table">
-          <el-table
-            :data="tableData"
-            border
-            style="width: 100%">
-            <el-table-column
-              prop="mName"
-              label="机构名称"
-              width="200">
-            </el-table-column>
-            <el-table-column
-              prop="mCode"
-              label="机构编码"
-              width="120">
-            </el-table-column>
-            <el-table-column
-              prop="mType"
-              label="机构类型"
-              width="120">
-            </el-table-column>
-            <el-table-column
-              prop="superiorName"
-              label="上级机构"
-              width="120">
-            </el-table-column>
-            <el-table-column
-              prop="mContent"
-              label="备注">
-            </el-table-column>
-            <el-table-column
-              label="操作"
-              width="100">
+          <el-table :data="tableData" border style="width: 100%">
+            <el-table-column prop="mName" label="机构名称" ></el-table-column>
+            <el-table-column prop="mCode" label="机构编码" width="120"></el-table-column>
+            <el-table-column prop="mType" label="机构类型" width="120"></el-table-column>
+            <el-table-column prop="superiorName" label="上级机构" ></el-table-column>
+            <el-table-column prop="mContent" label="备注" width="200"></el-table-column>
+            <el-table-column label="操作" width="140">
               <template slot-scope="scope">
                 <el-button @click="editOpen(scope.row.id)" type="text" size="small">修改</el-button>
                 <el-button @click="del(scope.row.id)" type="text" size="small">删除</el-button>
@@ -70,8 +43,8 @@
             :page-sizes="[10, 50, 100]"
             :page-size="pageSize"
             layout="total, sizes, prev, pager, next, jumper"
-            :total="total">
-          </el-pagination>
+            :total="total"
+          ></el-pagination>
         </div>
       </div>
     </div>
@@ -89,7 +62,8 @@
                   autocomplete="off"
                   placeholder="请选择"
                   class="el-input__inner"
-                  @click="choosePop = true">
+                  @click="choosePop = true"
+                >
               </div>
             </div>
           </el-form-item>
@@ -130,9 +104,20 @@
       </div>
     </el-dialog>
     <!--编辑弹框-->
-    <el-dialog title="编辑机构" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog
+      title="编辑机构"
+      :visible.sync="editPop"
+      class="tip-dialog"
+      :close-on-click-modal="false"
+    >
       <div class="pop-content">
-        <el-form ref="editObject" :model="editObject" label-width="100px" status-icon :rules="rules">
+        <el-form
+          ref="editObject"
+          :model="editObject"
+          label-width="100px"
+          status-icon
+          :rules="rules"
+        >
           <el-form-item label="上级机构">
             <div class="el-select" readonly="readonly">
               <div class="el-input el-input--suffix">
@@ -143,7 +128,8 @@
                   autocomplete="off"
                   placeholder="请选择"
                   class="el-input__inner"
-                  @click="choosePop = true">
+                  @click="choosePop = true"
+                >
               </div>
             </div>
           </el-form-item>
@@ -184,12 +170,14 @@
       </div>
     </el-dialog>
     <!--选择部门弹层-->
-    <el-dialog title="选择部门" :visible.sync="choosePop" class="choose-branch-pop" :close-on-click-modal="false">
+    <el-dialog
+      title="选择部门"
+      :visible.sync="choosePop"
+      class="choose-branch-pop"
+      :close-on-click-modal="false"
+    >
       <div class="pop-content">
-        <el-input
-          placeholder="输入关键字进行过滤"
-          v-model="filterText">
-        </el-input>
+        <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
         <el-tree
           @node-click="chooseNodeClick"
           class="filter-tree"
@@ -198,453 +186,453 @@
           :filter-node-method="filterNode"
           ref="filterTree"
           :default-expand-all="true"
-          :expand-on-click-node="false">
-        </el-tree>
+          :expand-on-click-node="false"
+        ></el-tree>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-  export default {
-    data() {
-      return {
-        filterText: '',
-        editPop: false,
-        addPop: false,
-        currentPage: 1,
-        pageSize: 10,
-        total : 0,
-        choosePop: false,
-        tableData: [],
-        // 机构树容器
-        listOrg:[],
-        // 树默认
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        },
-        // 机构名称展示
-        OrgName:'',
-        // 机构id获取
-        OrgId : 0,
-        // 新增
-        addObject: {
-          mName: '',
-          mCode: '',
-          mType: '',
-          mAddress: '',
-          mPhone: '',
-          mFax: '',
-          mEmail: '',
-          mContent: ''
-        },
-        editObject: {
-          mName: '',
-          mCode: '',
-          mType: '',
-          mAddress: '',
-          mPhone: '',
-          mFax: '',
-          mEmail: '',
-          mContent: ''
-        },
-        rules: {
-          mPhone:[
-            { required: true, message: '必填'}
-            ]
-        }
-
-      };
-    },
-    methods: {
-      //加载所有机构和部门
-      getTree(){
-        let params = {};
-        API.get('/mechanism/findTreeAll', params,{Authorization:storage.get('token')}).then((res) => {
-          // console.log(res.data)
-          if (res.data.code == 200) {
-            var arr = res.data.data;
-            this.listOrg = this.getOrg(arr)
-            // console.log(this.listOrg)
-          }else if(res.data.code == 1001){
-            this.signOut()
-          }else if(res.data.code == 401){
-            this.$router.push({name: 'auth'})
-          }
-        })
+export default {
+  data() {
+    return {
+      filterText: '',
+      editPop: false,
+      addPop: false,
+      currentPage: 1,
+      pageSize: 10,
+      total: 0,
+      choosePop: false,
+      tableData: [],
+      // 机构树容器
+      listOrg: [],
+      // 树默认
+      defaultProps: {
+        children: 'children',
+        label: 'label'
       },
-      // 树选择机构
-      chooseNodeClick(data) {
-        // console.log(data)
-        this.OrgName = data.label;
-        this.OrgId = data.id;
-        this.choosePop = false;
-      },
-      // 通过左侧树选择后展示右侧列表
-      getAllTreeList(id){
-        let params = {};
-        params['id'] = id;
-        API.get('/mechanism/findById', params,{Authorization:storage.get('token')}).then((res) => {
-          // console.log(res.data)
-          if (res.data.code == 200) {
-            this.total = res.data.count;
-            this.tableData = res.data.data;
-          }else if(res.data.code == 1001){
-            this.signOut()
-          }else if(res.data.code == 401){
-            this.$router.push({name: 'auth'})
-          }
-        })
-      },
-      handleNodeClick(data) {
-        //console.log(data.label);
-        this.getAllTreeList(data.id)
-      },
-      // 页面初始化
-      getPage() {
-        let params = {};
-        params['page'] = this.currentPage;
-        params['count'] = this.pageSize;
-        API.get('/mechanism/findAll', params,{Authorization:storage.get('token')}).then((res) => {
-          // console.log(res.data)
-          if (res.data.code == 200) {
-            this.total = res.data.count;
-            this.tableData = res.data.data;
-            this.getTree();
-          }else if(res.data.code == 1001){
-            this.signOut()
-          }else if(res.data.code == 401){
-            this.$router.push({name: 'auth'})
-          }
-        })
-      },
-      // 转换树结构
-      getOrg(list){
-        for(let i = 0;i < list.length; i++){
-          list[i]["label"] = list[i]["mName"];
-          if(list[i]["childnode"]){
-            list[i]["children"] = this.getOrg(list[i]["childnode"]);
-            delete list[i]["childnode"];
-          }
-        }
-        return list;
-      },
-
+      // 机构名称展示
+      OrgName: '',
+      // 机构id获取
+      OrgId: 0,
       // 新增
-      addOrg() {
-        if(this.$refs.addObject){
-          this.$refs.addObject.clearValidate();
-        }
-        this.addPop = true;
-        this.getTree();
-        this.addObject = {
-          mName: '',
-          mCode: '',
-          mType: '',
-          mAddress: '',
-          mPhone: '',
-          mFax: '',
-          mEmail: '',
-          mContent: ''
-        }
-        this.OrgId = '';
-        this.OrgName = '';
+      addObject: {
+        mName: '',
+        mCode: '',
+        mType: '',
+        mAddress: '',
+        mPhone: '',
+        mFax: '',
+        mEmail: '',
+        mContent: ''
       },
-
-      // 新增保存
-      addSave(formName){
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            let params = {};
-            params['mId'] = this.OrgId;
-            params['mName'] = this.addObject.mName;
-            params['mCode'] = this.addObject.mCode;
-            params['mType'] = this.addObject.mType;
-            params['mAddress'] = this.addObject.mAddress;
-            params['mPhone'] = this.addObject.mPhone;
-            params['mFax'] = this.addObject.mFax;
-            params['mEmail'] = this.addObject.mEmail;
-            params['mContent'] = this.addObject.mContent;
-
-            // console.log(params)
-            API.post('/mechanism/create', params,{Authorization:storage.get('token')}).then((res) => {
-              if (res.data.code == 200) {
-                this.addPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '新增成功!'
-                });
-              }else if(res.data.code == 1001){
-                this.signOut()
-              }else if(res.data.code == 401){
-                this.$router.push({name: 'auth'})
-              }else {
-                this.$message({
-                  type: 'error',
-                  message: '新增失败!'
-                });
-              }
-            })
-          }
-        })
+      editObject: {
+        mName: '',
+        mCode: '',
+        mType: '',
+        mAddress: '',
+        mPhone: '',
+        mFax: '',
+        mEmail: '',
+        mContent: ''
       },
-      // 编辑
-      editOpen(id){
-        if(this.$refs.editObject){
-          this.$refs.editObject.clearValidate();
+      rules: {
+        mPhone: [
+          { required: true, message: '必填' }
+        ]
+      }
+
+    };
+  },
+  methods: {
+    //加载所有机构和部门
+    getTree() {
+      let params = {};
+      API.get('/mechanism/findTreeAll', params, { Authorization: storage.get('tokenB') }).then((res) => {
+        // console.log(res.data)
+        if (res.data.code == 200) {
+          var arr = res.data.data;
+          this.listOrg = this.getOrg(arr)
+          // console.log(this.listOrg)
+        } else if (res.data.code == 1001) {
+          this.signOut()
+        } else if (res.data.code == 401) {
+          this.$router.push({ name: 'auth' })
         }
-        this.editPop = true;
-        this.getTree();
-        this.editObject = {
-          mName: '',
-          mCode: '',
-          mType: '',
-          mAddress: '',
-          mPhone: '',
-          mFax: '',
-          mEmail: '',
-          mContent: ''
+      })
+    },
+    // 树选择机构
+    chooseNodeClick(data) {
+      // console.log(data)
+      this.OrgName = data.label;
+      this.OrgId = data.id;
+      this.choosePop = false;
+    },
+    // 通过左侧树选择后展示右侧列表
+    getAllTreeList(id) {
+      let params = {};
+      params['id'] = id;
+      API.get('/mechanism/findById', params, { Authorization: storage.get('tokenB') }).then((res) => {
+        // console.log(res.data)
+        if (res.data.code == 200) {
+          this.total = res.data.count;
+          this.tableData = res.data.data;
+        } else if (res.data.code == 1001) {
+          this.signOut()
+        } else if (res.data.code == 401) {
+          this.$router.push({ name: 'auth' })
         }
-        this.OrgId = '';
-        this.OrgName = '';
-        let params = {};
-        params['id'] = id;
-        API.get('/mechanism/findOneById', params,{Authorization:storage.get('token')}).then((res) => {
-          // console.log(res.data)
-          if (res.data.code == 200) {
-            this.editObject = res.data.data[0];
-            // console.log(this.editObject)
-            var obj = res.data.data[0];
+      })
+    },
+    handleNodeClick(data) {
+      //console.log(data.label);
+      this.getAllTreeList(data.id)
+    },
+    // 页面初始化
+    getPage() {
+      let params = {};
+      params['page'] = this.currentPage;
+      params['count'] = this.pageSize;
+      API.get('/mechanism/findAll', params, { Authorization: storage.get('tokenB') }).then((res) => {
+        // console.log(res.data)
+        if (res.data.code == 200) {
+          this.total = res.data.count;
+          this.tableData = res.data.data;
+          this.getTree();
+        } else if (res.data.code == 1001) {
+          this.signOut()
+        } else if (res.data.code == 401) {
+          this.$router.push({ name: 'auth' })
+        }
+      })
+    },
+    // 转换树结构
+    getOrg(list) {
+      for (let i = 0; i < list.length; i++) {
+        list[i]["label"] = list[i]["mName"];
+        if (list[i]["childnode"]) {
+          list[i]["children"] = this.getOrg(list[i]["childnode"]);
+          delete list[i]["childnode"];
+        }
+      }
+      return list;
+    },
 
-            // 机构显示名称
-            this.OrgName = obj.superiorName;
-            this.OrgId = obj.mid;
-          }else if(res.data.code == 1001){
-            this.signOut()
-          }else if(res.data.code == 401){
-            this.$router.push({name: 'auth'})
-          }
-        })
-      },
+    // 新增
+    addOrg() {
+      if (this.$refs.addObject) {
+        this.$refs.addObject.clearValidate();
+      }
+      this.addPop = true;
+      this.getTree();
+      this.addObject = {
+        mName: '',
+        mCode: '',
+        mType: '',
+        mAddress: '',
+        mPhone: '',
+        mFax: '',
+        mEmail: '',
+        mContent: ''
+      }
+      this.OrgId = '';
+      this.OrgName = '';
+    },
 
-      // 编辑保存
-      editSave(formName){
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            let params = {};
-            params['mId'] = this.OrgId;
-            params['mName'] = this.editObject.mName;
-            params['mCode'] = this.editObject.mCode;
-            params['mType'] = this.editObject.mType;
-            params['mAddress'] = this.editObject.mAddress;
-            params['mPhone'] = this.editObject.mPhone;
-            params['mFax'] = this.editObject.mFax;
-            params['mEmail'] = this.editObject.mEmail;
-            params['mContent'] = this.editObject.mContent;
-
-            //console.log(params)
-
-            API.put('/mechanism/update', params,{Authorization:storage.get('token')}).then((res) => {
-              //console.log(res.data)
-              if (res.data.code == 200) {
-                this.editPop = false;
-                this.getPage();
-                this.$message({
-                  type: 'success',
-                  message: '编辑成功!'
-                });
-              }else if(res.data.code == 1001){
-                this.signOut()
-              }else if(res.data.code == 401){
-                this.$router.push({name: 'auth'})
-              }else {
-                this.$message({
-                  type: 'error',
-                  message: '编辑失败!'
-                });
-              }
-            })
-          }
-        })
-      },
-      // 删除
-      del(id) {
-        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
+    // 新增保存
+    addSave(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
           let params = {};
-          params['id'] = id;
-          API.delete('/mechanism/delete', params,{Authorization:storage.get('token')}).then((res) => {
+          params['mId'] = this.OrgId;
+          params['mName'] = this.addObject.mName;
+          params['mCode'] = this.addObject.mCode;
+          params['mType'] = this.addObject.mType;
+          params['mAddress'] = this.addObject.mAddress;
+          params['mPhone'] = this.addObject.mPhone;
+          params['mFax'] = this.addObject.mFax;
+          params['mEmail'] = this.addObject.mEmail;
+          params['mContent'] = this.addObject.mContent;
+
+          // console.log(params)
+          API.post('/mechanism/create', params, { Authorization: storage.get('tokenB') }).then((res) => {
             if (res.data.code == 200) {
+              this.addPop = false;
               this.getPage();
               this.$message({
                 type: 'success',
-                message: '删除成功!'
+                message: '新增成功!'
               });
-            } else if(res.data.code == 1001){
+            } else if (res.data.code == 1001) {
               this.signOut()
-            }else if(res.data.code == 401){
-              this.$router.push({name: 'auth'})
-            }else {
+            } else if (res.data.code == 401) {
+              this.$router.push({ name: 'auth' })
+            } else {
               this.$message({
                 type: 'error',
-                message: '删除失败!'+ res.data.message
+                message: '新增失败!'
               });
             }
           })
+        }
+      })
+    },
+    // 编辑
+    editOpen(id) {
+      if (this.$refs.editObject) {
+        this.$refs.editObject.clearValidate();
+      }
+      this.editPop = true;
+      this.getTree();
+      this.editObject = {
+        mName: '',
+        mCode: '',
+        mType: '',
+        mAddress: '',
+        mPhone: '',
+        mFax: '',
+        mEmail: '',
+        mContent: ''
+      }
+      this.OrgId = '';
+      this.OrgName = '';
+      let params = {};
+      params['id'] = id;
+      API.get('/mechanism/findOneById', params, { Authorization: storage.get('tokenB') }).then((res) => {
+        // console.log(res.data)
+        if (res.data.code == 200) {
+          this.editObject = res.data.data[0];
+          // console.log(this.editObject)
+          var obj = res.data.data[0];
+
+          // 机构显示名称
+          this.OrgName = obj.superiorName;
+          this.OrgId = obj.mid;
+        } else if (res.data.code == 1001) {
+          this.signOut()
+        } else if (res.data.code == 401) {
+          this.$router.push({ name: 'auth' })
+        }
+      })
+    },
+
+    // 编辑保存
+    editSave(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          let params = {};
+          params['mId'] = this.OrgId;
+          params['mName'] = this.editObject.mName;
+          params['mCode'] = this.editObject.mCode;
+          params['mType'] = this.editObject.mType;
+          params['mAddress'] = this.editObject.mAddress;
+          params['mPhone'] = this.editObject.mPhone;
+          params['mFax'] = this.editObject.mFax;
+          params['mEmail'] = this.editObject.mEmail;
+          params['mContent'] = this.editObject.mContent;
+
+          //console.log(params)
+
+          API.put('/mechanism/update', params, { Authorization: storage.get('tokenB') }).then((res) => {
+            //console.log(res.data)
+            if (res.data.code == 200) {
+              this.editPop = false;
+              this.getPage();
+              this.$message({
+                type: 'success',
+                message: '编辑成功!'
+              });
+            } else if (res.data.code == 1001) {
+              this.signOut()
+            } else if (res.data.code == 401) {
+              this.$router.push({ name: 'auth' })
+            } else {
+              this.$message({
+                type: 'error',
+                message: '编辑失败!'
+              });
+            }
+          })
+        }
+      })
+    },
+    // 删除
+    del(id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let params = {};
+        params['id'] = id;
+        API.delete('/mechanism/delete', params, { Authorization: storage.get('tokenB') }).then((res) => {
+          if (res.data.code == 200) {
+            this.getPage();
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+          } else if (res.data.code == 1001) {
+            this.signOut()
+          } else if (res.data.code == 401) {
+            this.$router.push({ name: 'auth' })
+          } else {
+            this.$message({
+              type: 'error',
+              message: '删除失败!' + res.data.message
+            });
+          }
         })
-      },
-
-      // 翻页器
-      handleSizeChange(val) {
-        //console.log(val);
-        this.pageSize = val;
-        this.getPage();
-      },
-      handleCurrentChange(val) {
-        //console.log(val);
-        this.currentPage = val;
-        this.getPage()
-      },
-
-
-      filterNode(value, data) {
-        if (!value) return true;
-        return data.label.indexOf(value) !== -1;
-      },
-
-
-
-      chooseBranchPop(){},
-      signOut(){
-        this.$message({
-          type: 'error',
-          message: '登录失效，请重新登录!'
-        });
-        storage.delete('Authorization');
-        storage.delete('auth');
-        storage.delete('token');
-        storage.delete('user');
-        this.$router.push({name:'login'})
-      }
+      })
     },
-    watch: {
-      filterText(val) {
-        this.$refs.filterTree.filter(val);
-      }
-    },
-    created() {
+
+    // 翻页器
+    handleSizeChange(val) {
+      //console.log(val);
+      this.pageSize = val;
       this.getPage();
-      // this.getmechAll();
+    },
+    handleCurrentChange(val) {
+      //console.log(val);
+      this.currentPage = val;
+      this.getPage()
+    },
 
 
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.label.indexOf(value) !== -1;
+    },
+
+
+
+    chooseBranchPop() { },
+    signOut() {
+      this.$message({
+        type: 'error',
+        message: '登录失效，请重新登录!'
+      });
+      // storage.delete('Authorization');
+      storage.delete('authB');
+      storage.delete('tokenB');
+      storage.delete('userB');
+      this.$router.push({ name: 'login' })
     }
-  };
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.filterTree.filter(val);
+    }
+  },
+  created() {
+    this.getPage();
+    // this.getmechAll();
+
+
+  }
+};
 </script>
 <style lang="less">
-  .org-page {
-    .content {
-      .search-nav {
-        .flex {
-          display: flex;
-        }
-        .name {
-          display: block;
-          line-height: 40px;
-          font-weight: 600;
-          width: 120px;
-          font-size: 17px;
-        }
+.org-page {
+  .content {
+    .search-nav {
+      .flex {
+        display: flex;
       }
-      .result-table {
-        .has-gutter {
-          tr {
-            th {
-              background: #026ab3;
-              color: #fff;
-              font-weight: 700;
-              text-align: center;
-            }
+      .name {
+        display: block;
+        line-height: 40px;
+        font-weight: 600;
+        width: 120px;
+        font-size: 17px;
+      }
+    }
+    .result-table {
+      .has-gutter {
+        tr {
+          th {
+            background: #026ab3;
+            color: #fff;
+            font-weight: 700;
+            text-align: center;
           }
         }
       }
     }
-    .el-dialog__wrapper.tip-dialog {
-      .el-dialog {
-        margin: 15vh auto !important;
-        width: 50%;
-        max-width: 1200px;
-        min-width: 500px;
-      }
-    }
-    .el-dialog__wrapper.choose-branch-pop {
-      .el-dialog {
-        margin: 15vh auto !important;
-        width: 400px;
-        .pop-content {
-          height: 600px;
-        }
-      }
-    }
-    .el-radio {
-      margin: 0 30px 20px 0;
-    }
-    .el-radio + .el-radio {
-      margin: 0 30px 20px 0;
+  }
+  .el-dialog__wrapper.tip-dialog {
+    .el-dialog {
+      margin: 15vh auto !important;
+      width: 50%;
+      max-width: 1200px;
+      min-width: 500px;
     }
   }
+  .el-dialog__wrapper.choose-branch-pop {
+    .el-dialog {
+      margin: 15vh auto !important;
+      width: 400px;
+      .pop-content {
+        height: 600px;
+      }
+    }
+  }
+  .el-radio {
+    margin: 0 30px 20px 0;
+  }
+  .el-radio + .el-radio {
+    margin: 0 30px 20px 0;
+  }
+}
 </style>
 
 <style lang="less" scoped>
-  .org-page {
-    min-height: 800px;
-    background: #fff;
-    width: 100%;
+.org-page {
+  min-height: 780px;
+  background: #fff;
+  width: 100%;
+  overflow: hidden;
+  .cell {
+    float: left;
+    min-height: 780px;
+    height: auto;
+    border-radius: 3px;
     overflow: hidden;
-    .cell {
-      float: left;
-      min-height: 800px;
-      height: auto;
-      border-radius: 3px;
-      overflow: hidden;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    .content {
+      padding: 20px 10px;
       box-sizing: border-box;
-      border: 1px solid #ccc;
-      .content {
-        padding: 20px 10px;
-        box-sizing: border-box;
-        .btn {
-          button {
-            padding: 10px 15px;
-            font-size: 12px;
-          }
-        }
-        .result-table {
-          margin-top: 20px;
-        }
-        .pagination-box {
-          margin-top: 40px;
-          text-align: center;
+      .btn {
+        button {
+          padding: 10px 15px;
+          font-size: 12px;
         }
       }
-      .title {
-        height: 40px;
-        background: #026ab3;
+      .result-table {
+        margin-top: 20px;
+      }
+      .pagination-box {
+        margin-top: 20px;
         text-align: center;
-        line-height: 40px;
-        color: #fff;
-      }
-      &.left {
-        width: 18%;
-        margin: 20px 1%;
-      }
-      &.right {
-        width: 79%;
-        margin: 20px 1% 0 0;
       }
     }
+    .title {
+      height: 40px;
+      background: #026ab3;
+      text-align: center;
+      line-height: 40px;
+      color: #fff;
+    }
+    &.left {
+      width: 18%;
+      margin: 20px 1%;
+    }
+    &.right {
+      width: 79%;
+      margin: 20px 1% 0 0;
+    }
   }
+}
 </style>

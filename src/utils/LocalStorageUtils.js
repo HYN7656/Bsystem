@@ -9,16 +9,7 @@ class LocalStorageUtils {
    * @param key
    */
   get(key) {
-    if (window.localStorage) {
-      // key = compile(key);
-      let storage = window.localStorage;
-      if(storage.getItem(key)){
-        return uncompile(storage.getItem(key));
-      }else{
-        return null;
-      }
-    }
-    return false;
+    return this.getJson(key);
   }
 
   /**
@@ -28,8 +19,7 @@ class LocalStorageUtils {
     if (window.localStorage) {
       // key = compile(key);
       let storage = window.localStorage;
-      let value = storage.getItem(key) ? JSON.parse(uncompile(storage.getItem(key))) : null;
-      return value;
+      return storage.getItem(key) ? JSON.parse(uncompile(storage.getItem(key))) : undefined;
     }
     return false;
   }
@@ -39,12 +29,7 @@ class LocalStorageUtils {
    * @param {String} value 字符串
    */
   set(key, value) {
-    if (window.localStorage) {
-      // key = compile(key);
-      value = compile(value);
-      let storage = window.localStorage;
-      storage.setItem(key, value);
-    }
+    this.setJson(key, value);
   }
 
   /**

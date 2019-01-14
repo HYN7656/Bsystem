@@ -12,6 +12,7 @@
 
 <style lang="less" scoped>
   .p_footer{
+    position: absolute;
     background-color: #026ab3;
     height: 35px;
     line-height: 35px;
@@ -21,7 +22,4 @@
     color:#fff;
     bottom: 0;
   }
-  /*.p_footer div{
-    padding-top: 40px;
-  }*/
 </style>

@@ -7,10 +7,7 @@ export default {
 
   url: '',
   //测试环境
-  baseURL: 'http://192.168.3.41:8084',
-  //baseURL: 'http://192.168.241.35:8084',
-  //正式环境
-  // baseURL: 'http://10.0.56.7:8084',
+  baseURL: '',
   secret: '888A9AE0E1EEE6A7421D7C8774BD41FC',
   passwordsecret: '*975b99fe*15c9*4341*b21a*f355926ded00',
 

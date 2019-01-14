@@ -27,8 +27,8 @@
 </template>
 
 <script>
-  import md5 from 'js-md5';
-  import Utils from '@/utils/utils2.js'
+import md5 from 'js-md5';
+import { encrypt } from '@/utils/utils.js'
   export default {
     data() {
       return {
@@ -49,8 +49,9 @@
         } else {
           let params = {};
           params['uName'] = this.userNum;
-          params['uPasswd'] =Utils.encrypt(this.userPassword);
-          console.log(params)
+          // params['uPasswd'] = encrypt(this.userPassword);
+          params['uPasswd'] = this.userPassword;
+          // console.log(params)
           API.post('/user/login', params).then((res) => {
             //console.log(res.data)
             if (res.data.code == 200) {
@@ -59,10 +60,10 @@
                 message: '登录成功!'
               });
               //console.log(res.data.data.token)
-              storage.set('Authorization', res.data.data.token);
-              storage.set('token', res.data.data.token);
-              storage.setJson('user', res.data.data.user);
-              storage.setJson('auth', res.data.data.diction);
+              // storage.set('AuthorizationB', res.data.data.token);
+              storage.set('tokenB', res.data.data.token);
+              storage.setJson('userB', res.data.data.user);
+              storage.setJson('authB', res.data.data.diction);
               this.$router.push({name: 'home'})
             } else {
               this.$message({

@@ -51,15 +51,17 @@
             <el-input v-model="addObject.roleName"></el-input>
           </el-form-item>
           <el-form-item label="角色授权">
-            <el-tree
-              :data="listMenu"
-              show-checkbox
-              node-key="id"
-              ref="Tree"
-              :default-expand-all="true"
-              :props="defaultPropsRole"
-              @check-change="handleCheckChange"
-            ></el-tree>
+            <div class="roleTree">
+              <el-tree
+                :data="listMenu"
+                show-checkbox
+                node-key="id"
+                ref="Tree"
+                :default-expand-all="true"
+                :props="defaultPropsRole"
+                @check="handleCheckChange"
+              ></el-tree>
+            </div>
           </el-form-item>
           <el-form-item label="备注">
             <el-input type="textarea" v-model="addObject.desc"></el-input>
@@ -84,21 +86,23 @@
             <el-input v-model="editObject.roleName"></el-input>
           </el-form-item>
           <el-form-item label="角色授权">
-            <el-tree
-              :data="listMenu"
-              show-checkbox
-              node-key="id"
-              ref="Tree2"
-              :default-expand-all="true"
-              :props="defaultPropsRole"
-              @check-change="EdithandleCheckChange"
-            ></el-tree>
+            <div class="roleTree">
+              <el-tree
+                :data="listMenu"
+                show-checkbox
+                node-key="id"
+                ref="Tree2"
+                :default-expand-all="true"
+                :props="defaultPropsRole"
+                @check="EditCheck"
+              ></el-tree>
+            </div>
           </el-form-item>
           <el-form-item label="备注">
             <el-input type="textarea" v-model="editObject.desc"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="editSave">保存</el-button>
+            <el-button type="primary" @click="editSave" :disabled="saveDisabled">保存</el-button>
             <el-button @click="editPop=false">返回</el-button>
           </el-form-item>
         </el-form>
@@ -267,6 +271,11 @@ export default {
         roleName: "",
         desc: ""
       },
+      //含有子节点的父节点ID，也叫半选中节点
+      halfCheckedKeys: [],
+      //含有子节点的父节点ID，半取消节点
+      halfUnCheckedKeys: [],
+      saveDisabled: true,
       mechanismId: "",
       // 分配
       assignRolePop: false,
@@ -294,9 +303,7 @@ export default {
       arrFP: [],
       arrXZ: [],
       roleId: "",
-
       middleChooseBranch: "",
-
       filterText: "",
       data: []
     };
@@ -308,7 +315,7 @@ export default {
       params["page"] = this.currentPage;
       params["count"] = this.pageSize;
       API.get("/role/showRoleList", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
@@ -322,16 +329,16 @@ export default {
         }
       });
     },
-    //用户树
+    //用户菜单树
     getTree() {
       let params = {};
       API.get("/menu/findMenuList", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
-          var arr = res.data.data.treeList;
-          this.listMenu = this.getOrg(arr);
+          this.listMenu = this.getOrg(res.data.data.treeList);
+          // console.log("用户角色，转换之后：", this.listMenu);
         } else if (res.data.code == 1001) {
           this.signOut();
         } else if (res.data.code == 401) {
@@ -339,13 +346,14 @@ export default {
         }
       });
     },
-    // 转换用户角色树结构
+    // 转换用户角色树结构, 顺便把子节点的父节点筛选出来
     getOrg(list) {
-      for (let i = 0; i < list.length; i++) {
-        list[i]["label"] = list[i]["name"];
-        if (list[i]["children"]) {
-          list[i]["children"] = this.getOrg(list[i]["children"]);
-          // delete list[i]["children"];
+      for (let i in list) {
+        list[i].label = list[i].name;
+        if (list[i].children.length > 0) {
+          // console.log(list[i]);
+          this.halfUnCheckedKeys.push(list[i].id);
+          this.getOrg(list[i].children);
         }
       }
       return list;
@@ -354,12 +362,12 @@ export default {
     getAffiliate() {
       let params = {};
       API.get("/user/findMechanismAndRole", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
           var arr = res.data.data.mechanismAll;
-          // console.log(arr)
+          // console.log(arr);
           this.OrgOpt = arr;
         } else if (res.data.code == 1001) {
           this.signOut();
@@ -371,28 +379,33 @@ export default {
     // 新增
     addMenu() {
       this.addPop = true;
+      this.halfCheckedKeys = [];
       this.addObject = {
         umechanism: "",
         roleName: "",
         desc: ""
       };
       this.menus = "";
+      if (this.$refs.Tree) {
+        this.$refs.Tree.setCheckedKeys([]);
+      }
     },
     // 新增保存
     addSave() {
       let params = {};
       params["mechanismId"] = this.addObject.umechanism;
       params["roleName"] = this.addObject.roleName;
-      if(this.menus) {
+      if (this.menus) {
+        this.menus = this.menus.concat(this.halfCheckedKeys);
         params["menus"] = this.menus.join(",");
-      }else {
+      } else {
         params["menus"] = '';
       }
 
       params["desc"] = this.addObject.desc;
-      console.log(params)
+      // console.log(params)
       API.post("/role/addRole", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
         //console.log(res.data)
         if (res.data.code == 200) {
@@ -414,18 +427,36 @@ export default {
         }
       });
     },
-    // 角色选择
-    handleCheckChange(data, checked, indeterminate) {
-      this.menus = this.$refs.Tree.getCheckedKeys(false);
-      console.log(this.menus)
+    /**
+    * 创建角色时，当复选框被点击的时候触发，
+    * node 节点所对应的对象
+    * selected 树目前的选中状态对象，包含
+    * {checkedNodes、checkedKeys、halfCheckedNodes、halfCheckedKeys 四个属性}
+    */
+    handleCheckChange(node, selected) {
+      this.menus = selected.checkedKeys;
+      this.halfCheckedKeys = selected.halfCheckedKeys;
+      // console.log("角色选择", this.menus);
+      // console.log("角色选择, 树目前的选中状态对象", selected);
     },
-    EdithandleCheckChange(){
-      this.menus2 = this.$refs.Tree2.getCheckedKeys(false);
-      console.log(this.menus2)
+    /**
+     * 修改角色时，当复选框被点击的时候触发，
+     * node 节点所对应的对象
+     * selected 树目前的选中状态对象，包含
+     * {checkedNodes、checkedKeys、halfCheckedNodes、halfCheckedKeys 四个属性}
+     */
+    EditCheck(node, selected) {
+      this.saveDisabled = false;
+      this.menus2 = selected.checkedKeys;
+      this.halfCheckedKeys = selected.halfCheckedKeys;
+      // console.log("当复选框被点击的时候触发，节点所对应的对象", node);
+      // console.log("当复选框被点击的时候触发, 树目前的选中状态对象", selected);
     },
     // 编辑
     editOpen(id) {
       this.editPop = true;
+      this.saveDisabled = true;
+      this.halfCheckedKeys = [];
       this.editObject = {
         roleName: "",
         desc: ""
@@ -434,10 +465,14 @@ export default {
       this.mechanismId = "";
       let params = {};
       params["id"] = id;
+      if (this.$refs.Tree2) {
+        this.$refs.Tree2.setCheckedKeys([]);
+      }
+
       API.get("/role/findRoleById", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
-        console.log(res.data)
+        // console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data.roleInfo;
           this.mechanismId = res.data.data.roleInfo.mechanismId;
@@ -446,11 +481,19 @@ export default {
           if (keyList) {
             var arr = keyList.split(",");
             var arr2 = [];
-            for (var i = 0; i < arr.length; i++) {
-              arr2.push(parseInt(arr[i]));
+            //遍历把父节点去掉
+            for (let i in arr) {
+              for (let h in this.halfUnCheckedKeys) {
+                if (parseInt(arr[i]) === this.halfUnCheckedKeys[h]) {
+                  arr.splice(i, 1);
+                  continue;
+                }
+              }
+              if (arr[i]) {
+                arr2.push(parseInt(arr[i]));
+              }
             }
-            console.log(arr2)
-             this.$refs.Tree2.setCheckedKeys(arr2);
+            this.$refs.Tree2.setCheckedKeys(arr2);
             this.menus2 = this.$refs.Tree2.getCheckedKeys();
           }
         } else if (res.data.code == 1001) {
@@ -466,16 +509,16 @@ export default {
       params["id"] = this.editObject.id;
       params["mechanismId"] = this.mechanismId;
       params["roleName"] = this.editObject.roleName;
-      if(this.menus2){
+      if (this.menus2) {
+        this.menus2 = this.menus2.concat(this.halfCheckedKeys);
         params["menus"] = this.menus2.join(",");
-      }else {
+      } else {
         params["menus"] = '';
       }
-
       params["desc"] = this.editObject.desc;
-      console.log(params)
+      // console.log(params)
       API.post("/role/updateRole", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
         //console.log(res.data)
         if (res.data.code == 200) {
@@ -518,7 +561,7 @@ export default {
         let params = {};
         params["id"] = id;
         API.post("/role/del", params, {
-          Authorization: storage.get("token")
+          Authorization: storage.get("tokenB")
         }).then(res => {
           if (res.data.code == 200) {
             this.getPage();
@@ -554,7 +597,7 @@ export default {
       let params = {};
       params["RoleId"] = id;
       API.get("/user/findByRoleId", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
         // console.log(res.data)
         if (res.data.code == 200) {
@@ -583,9 +626,9 @@ export default {
     getTree2() {
       let params = {};
       API.get("/mechanism/findTreeAll", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
-        // console.log(res.data)
+        // console.log(res.data);
         if (res.data.code == 200) {
           var arr = res.data.data;
           this.listOrg = this.getOrg2(arr);
@@ -616,7 +659,7 @@ export default {
         params["MechanismId"] = val.id;
         params["userId"] = this.arrXZ.join(",");
         API.get("/user/findUserByMechanismId", params, {
-          Authorization: storage.get("token")
+          Authorization: storage.get("tokenB")
         }).then(res => {
           // console.log(res.data)
           if (res.data.code == 200) {
@@ -634,7 +677,7 @@ export default {
         params["DepartmentId"] = val.id;
         params["userId"] = this.arrXZ.join(",");
         API.get("/user/findUserByDepartmentId", params, {
-          Authorization: storage.get("token")
+          Authorization: storage.get("tokenB")
         }).then(res => {
           // console.log(res.data)
           if (res.data.code == 200) {
@@ -688,7 +731,7 @@ export default {
       params["roleId"] = this.roleId;
       //console.log(params)
       API.post("/userRole/create", params, {
-        Authorization: storage.get("token")
+        Authorization: storage.get("tokenB")
       }).then(res => {
         //console.log(res.data)
         if (res.data.code == 200) {
@@ -745,7 +788,7 @@ export default {
         params["roleId"] = this.roleId;
         //console.log(params)
         API.delete("/userRole/delete", params, {
-          Authorization: storage.get("token")
+          Authorization: storage.get("tokenB")
         }).then(res => {
           if (res.data.code == 200) {
             this.assignRolePop = true;
@@ -795,10 +838,10 @@ export default {
         type: "error",
         message: "登录失效，请重新登录!"
       });
-      storage.delete("Authorization");
-      storage.delete("auth");
-      storage.delete("token");
-      storage.delete("user");
+      // storage.delete("Authorization");
+      storage.delete("authB");
+      storage.delete("tokenB");
+      storage.delete("userB");
       this.$router.push({ name: "login" });
     }
   },
@@ -833,7 +876,7 @@ export default {
   }
   .el-dialog__wrapper.tip-dialog {
     .el-dialog {
-      margin: 15vh auto !important;
+      // margin: 15vh auto !important;
       width: 1000px;
     }
   }
@@ -869,10 +912,10 @@ export default {
     }
     &.assign-detail-dialog {
       .el-dialog {
-        margin: 10vh auto !important;
-        width: 1000px;
+        // margin: 10vh auto !important;
+        // width: 1000px;
         position: relative;
-        height: 700px;
+        // height: 700px;
         .pop-content {
           overflow-y: auto;
           height: 100%;
@@ -913,7 +956,7 @@ export default {
   }
   .el-dialog__wrapper.choose-branch-pop {
     .el-dialog {
-      margin: 15vh auto !important;
+      // margin: 15vh auto !important;
       width: 400px;
       .pop-content {
         height: 600px;
@@ -922,7 +965,7 @@ export default {
   }
   .el-dialog__wrapper.choose-pop {
     .el-dialog {
-      margin: 15vh auto !important;
+      // margin: 15vh auto !important;
       width: 400px;
       .pop-content {
         height: 600px;
@@ -935,16 +978,20 @@ export default {
   .el-radio + .el-radio {
     margin: 0 30px 20px 0;
   }
+  .roleTree {
+    overflow: auto;
+    height: 300px;
+  }
 }
 </style>
 
 <style lang="less" scoped>
 .role-page {
-  min-height: 800px;
+  min-height: 780px;
   background: #fff;
   width: 100%;
   .cell {
-    min-height: 800px;
+    min-height: 780px;
     height: auto;
     width: 98%;
     margin: 0 1%;
