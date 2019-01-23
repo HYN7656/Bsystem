@@ -59,7 +59,6 @@ import { encrypt } from '@/utils/utils.js'
                 type: 'success',
                 message: '登录成功!'
               });
-              //console.log(res.data.data.token)
               // storage.set('Authorization', res.data.data.token);
               storage.set('Token', res.data.data.token);
               storage.setJson('User', res.data.data.user);

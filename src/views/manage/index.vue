@@ -12,22 +12,22 @@
               <el-tab-pane label="个人信息" name="first">
                 <el-form ref="form" :model="form" label-width="80px">
                   <el-form-item label="工号:">
-                    <el-input v-bind:disabled="edit"></el-input>
+                    <el-input v-bind:disabled="edit" placeholder="请输入工号"></el-input>
                   </el-form-item>
                   <el-form-item label="姓名:">
-                    <el-input v-model="form.uUsername" v-bind:disabled="edit"></el-input>
+                    <el-input v-model="form.uUsername" v-bind:disabled="edit" placeholder="请输入姓名"></el-input>
                   </el-form-item>
                   <el-form-item label="登录名:">
-                    <el-input v-model="form.uName" v-bind:disabled="edit"></el-input>
+                    <el-input v-model="form.uName" v-bind:disabled="edit" placeholder="请输入登录名"></el-input>
                   </el-form-item>
                   <el-form-item label="邮箱:">
-                    <el-input v-model="form.uEmail" v-bind:disabled="edit"></el-input>
+                    <el-input v-model="form.uEmail" v-bind:disabled="edit" placeholder="请输入邮箱"></el-input>
                   </el-form-item>
                   <el-form-item label="电话:">
-                    <el-input v-model="form.uTelephone" v-bind:disabled="edit"></el-input>
+                    <el-input v-model="form.uTelephone" v-bind:disabled="edit" placeholder="请输入电话"></el-input>
                   </el-form-item>
                   <el-form-item label="手机:">
-                    <el-input v-model="form.uMobilephone" v-bind:disabled="edit"></el-input>
+                    <el-input v-model="form.uMobilephone" v-bind:disabled="edit" placeholder="请输入手机"></el-input>
                   </el-form-item>
                   <!--编辑-->
                   <el-form-item>
@@ -39,13 +39,13 @@
               <!--<el-tab-pane label="密码" name="second" class="password-cell" :disabled="edit">
                 <el-form ref="form" :model="form" label-width="100px">
                   <el-form-item label="原密码:">
-                    <el-input v-model="form.num" ></el-input>
+                    <el-input v-model="form.num" placeholder="请输入原密码"></el-input>
                   </el-form-item>
                   <el-form-item label="新密码:">
-                    <el-input v-model="form.name"></el-input>
+                    <el-input v-model="form.name" placeholder="请输入新密码"></el-input>
                   </el-form-item>
                   <el-form-item label="新密码确认:">
-                    <el-input v-model="form.loginName"></el-input>
+                    <el-input v-model="form.loginName" placeholder="请再次输入新密码"></el-input>
                   </el-form-item>
                   &lt;!&ndash;编辑&ndash;&gt;
                   <el-form-item>

@@ -39,16 +39,16 @@
       </div>
     </div>
     <!--新增-->
-    <el-dialog title="新增" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="新增" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <div class="pop-content">
-        <el-form ref="addObject" :model="addObject" label-width="100px">
-          <el-form-item label="归属机构">
+        <el-form ref="addObject" :model="addObject" label-width="100px" :rules="rules">
+          <el-form-item label="归属机构" prop="umechanism">
             <el-select v-model="addObject.umechanism" placeholder="请选择归属机构">
               <el-option v-for="item in OrgOpt" :key="item.id" :label="item.mName" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="角色名称">
-            <el-input v-model="addObject.roleName"></el-input>
+          <el-form-item label="角色名称" prop="roleName">
+            <el-input v-model="addObject.roleName" placeholder="请输入角色名称"></el-input>
           </el-form-item>
           <el-form-item label="角色授权">
             <div class="roleTree">
@@ -64,26 +64,26 @@
             </div>
           </el-form-item>
           <el-form-item label="备注">
-            <el-input type="textarea" v-model="addObject.desc"></el-input>
+            <el-input type="textarea" v-model="addObject.desc" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="addSave">保存</el-button>
+            <el-button type="primary" @click="addSave('addObject')" :loading='loadingBtn'>保存</el-button>
             <el-button @click="addPop=false">返回</el-button>
           </el-form-item>
         </el-form>
       </div>
     </el-dialog>
     <!--修改-->
-    <el-dialog title="修改" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="修改" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <div class="pop-content">
-        <el-form ref="editObject" :model="editObject" label-width="100px">
+        <el-form ref="editObject" :model="editObject" label-width="100px" :rules="rules">
           <el-form-item label="归属机构">
             <el-select v-model="mechanismId" placeholder="请选择归属机构">
               <el-option v-for="item in OrgOpt" :key="item.id" :label="item.mName" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="角色名称">
-            <el-input v-model="editObject.roleName"></el-input>
+          <el-form-item label="角色名称" prop="roleName">
+            <el-input v-model="editObject.roleName" placeholder="请输入角色名称"></el-input>
           </el-form-item>
           <el-form-item label="角色授权">
             <div class="roleTree">
@@ -99,10 +99,10 @@
             </div>
           </el-form-item>
           <el-form-item label="备注">
-            <el-input type="textarea" v-model="editObject.desc"></el-input>
+            <el-input type="textarea" v-model="editObject.desc" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="editSave" :disabled="saveDisabled">保存</el-button>
+            <el-button type="primary" @click="editSave('editObject')"  :loading='loadingBtn'>保存</el-button>
             <el-button @click="editPop=false">返回</el-button>
           </el-form-item>
         </el-form>
@@ -205,7 +205,7 @@
             <div
               class="user"
               v-for="list in userData"
-              :key="list.id"
+
               @click="chooseRoleClick(list)"
             >
               <i class="fa fa-user"></i>
@@ -220,7 +220,7 @@
               class="user"
               :style="{color:'red'}"
               v-for="(list,index) in chooseUserData"
-              :key="list.id"
+
               @click="delRoleClick1(index)"
             >
               <i class="fa fa-user"></i>
@@ -229,7 +229,7 @@
             <div
               class="user"
               v-for="(list,index) in chooseUserData2"
-              :key="list.id"
+
               @click="delRoleClick2(index)"
             >
               <i class="fa fa-user"></i>
@@ -251,6 +251,7 @@
 export default {
   data() {
     return {
+      loadingBtn : false,
       addPop: false,
       editPop: false,
       currentPage: 1,
@@ -275,7 +276,6 @@ export default {
       halfCheckedKeys: [],
       //含有子节点的父节点ID，半取消节点
       halfUnCheckedKeys: [],
-      saveDisabled: true,
       mechanismId: "",
       // 分配
       assignRolePop: false,
@@ -305,7 +305,17 @@ export default {
       roleId: "",
       middleChooseBranch: "",
       filterText: "",
-      data: []
+      data: [],
+      rules: {
+        roleName: [
+          { required: true, message: '角色名称必填' },
+          { min: 1, max: 30, message: '长度在 1 到 20 个字符之间', trigger: 'blur' }
+        ],
+        umechanism : [
+          { required: true, message: '归属机构必填' }
+        ],
+      },
+      num : 0
     };
   },
   methods: {
@@ -379,6 +389,8 @@ export default {
     // 新增
     addMenu() {
       this.addPop = true;
+      this.loadingBtn = false;
+      this.num = 0;
       this.halfCheckedKeys = [];
       this.addObject = {
         umechanism: "",
@@ -391,41 +403,58 @@ export default {
       }
     },
     // 新增保存
-    addSave() {
-      let params = {};
-      params["mechanismId"] = this.addObject.umechanism;
-      params["roleName"] = this.addObject.roleName;
-      if (this.menus) {
-        this.menus = this.menus.concat(this.halfCheckedKeys);
-        params["menus"] = this.menus.join(",");
-      } else {
-        params["menus"] = '';
-      }
+    addSave(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.num ++;
+          if(this.num == 1) {
+            this.loadingBtn = true;
+            let params = {};
+            params["mechanismId"] = this.addObject.umechanism;
+            params["roleName"] = this.addObject.roleName;
+            if (this.menus) {
+              this.menus = this.menus.concat(this.halfCheckedKeys);
+              params["menus"] = this.menus.join(",");
+            } else {
+              params["menus"] = '';
+            }
 
-      params["desc"] = this.addObject.desc;
-      // console.log(params)
-      API.post("/role/addRole", params, {
-        Authorization: storage.get("Token")
-      }).then(res => {
-        //console.log(res.data)
-        if (res.data.code == 200) {
-          this.addPop = false;
-          this.getPage();
-          this.$message({
-            type: "success",
-            message: "新增成功!"
-          });
-        } else if (res.data.code == 1001) {
-          this.signOut();
-        } else if (res.data.code == 401) {
-          this.$router.push({ name: "auth" });
-        } else {
-          this.$message({
-            type: "error",
-            message: "新增失败!"
-          });
+            params["desc"] = this.addObject.desc;
+            // console.log(params)
+            API.post("/role/addRole", params, {
+              Authorization: storage.get("Token")
+            }).then(res => {
+              //console.log(res.data)
+              if (res.data.code == 200) {
+                this.addPop = false;
+                this.getPage();
+                this.$message({
+                  type: "success",
+                  message: "新增成功!"
+                });
+              } else if (res.data.code == 1001) {
+                this.signOut();
+              } else if (res.data.code == 401) {
+                this.$router.push({ name: "auth" });
+              } else {
+                this.$message({
+                  type: "error",
+                  message: "新增失败!"
+                });
+                this.loadingBtn = false;
+                this.num = 0;
+              }
+            });
+          }else {
+            return
+          }
+
+        }else {
+          this.loadingBtn = false;
+          this.num = 0;
         }
-      });
+      })
+
     },
     /**
     * 创建角色时，当复选框被点击的时候触发，
@@ -446,7 +475,6 @@ export default {
      * {checkedNodes、checkedKeys、halfCheckedNodes、halfCheckedKeys 四个属性}
      */
     EditCheck(node, selected) {
-      this.saveDisabled = false;
       this.menus2 = selected.checkedKeys;
       this.halfCheckedKeys = selected.halfCheckedKeys;
       // console.log("当复选框被点击的时候触发，节点所对应的对象", node);
@@ -455,7 +483,8 @@ export default {
     // 编辑
     editOpen(id) {
       this.editPop = true;
-      this.saveDisabled = true;
+      this.loadingBtn = false;
+      this.num = 0;
       this.halfCheckedKeys = [];
       this.editObject = {
         roleName: "",
@@ -504,41 +533,56 @@ export default {
       });
     },
     // 编辑保存
-    editSave() {
-      let params = {};
-      params["id"] = this.editObject.id;
-      params["mechanismId"] = this.mechanismId;
-      params["roleName"] = this.editObject.roleName;
-      if (this.menus2) {
-        this.menus2 = this.menus2.concat(this.halfCheckedKeys);
-        params["menus"] = this.menus2.join(",");
-      } else {
-        params["menus"] = '';
-      }
-      params["desc"] = this.editObject.desc;
-      // console.log(params)
-      API.post("/role/updateRole", params, {
-        Authorization: storage.get("Token")
-      }).then(res => {
-        //console.log(res.data)
-        if (res.data.code == 200) {
-          this.editPop = false;
-          this.getPage();
-          this.$message({
-            type: "success",
-            message: "修改成功!"
-          });
-        } else if (res.data.code == 401) {
-          this.$router.push({ name: "auth" });
-        } else if (res.data.code == 1001) {
-          this.signOut();
-        } else {
-          this.$message({
-            type: "error",
-            message: "修改失败!"
-          });
+    editSave(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.num ++;
+          if(this.num == 1) {
+            this.loadingBtn = true;
+            let params = {};
+            params["id"] = this.editObject.id;
+            params["mechanismId"] = this.mechanismId;
+            params["roleName"] = this.editObject.roleName;
+            if (this.menus2) {
+              this.menus2 = this.menus2.concat(this.halfCheckedKeys);
+              params["menus"] = this.menus2.join(",");
+            } else {
+              params["menus"] = '';
+            }
+            params["desc"] = this.editObject.desc;
+            // console.log(params)
+            API.post("/role/updateRole", params, {
+              Authorization: storage.get("Token")
+            }).then(res => {
+              //console.log(res.data)
+              if (res.data.code == 200) {
+                this.editPop = false;
+                this.getPage();
+                this.$message({
+                  type: "success",
+                  message: "修改成功!"
+                });
+              } else if (res.data.code == 401) {
+                this.$router.push({ name: "auth" });
+              } else if (res.data.code == 1001) {
+                this.signOut();
+              } else {
+                this.$message({
+                  type: "error",
+                  message: "修改失败!"
+                });
+                this.loadingBtn = false;
+                this.num = 0;
+              }
+            });
+          }else{
+            return
+          }
+        }else {
+          this.loadingBtn = false;
+          this.num = 0;
         }
-      });
+      })
     },
     // 翻页器
     handleSizeChange(val) {
@@ -576,7 +620,7 @@ export default {
           } else if (res.data.code == 10013) {
             this.$message({
               type: "error",
-              message: "有权限不可删除!"
+              message: res.data.message
             });
           } else {
             this.$message({
@@ -590,6 +634,9 @@ export default {
     /***********************角色分配模块**************************************/
     // 分配
     allotOpen(id, name, jg) {
+      console.log(id)
+      console.log(name)
+      console.log(jg)
       this.assignRolePop = true;
       this.fpName = name;
       this.fpJg = jg;
@@ -726,33 +773,43 @@ export default {
         arr.push(this.arrFP[i].id);
       }
       arr = this.uniq(arr);
-      let params = {};
-      params["userIds"] = arr.join(",");
-      params["roleId"] = this.roleId;
-      //console.log(params)
-      API.post("/userRole/create", params, {
-        Authorization: storage.get("Token")
-      }).then(res => {
-        //console.log(res.data)
-        if (res.data.code == 200) {
-          this.assignRoleDetailPop = false;
-          this.$message({
-            type: "success",
-            message: "分配成功，需重新登录才起效!"
-          });
-          this.assignRolePop = true;
-          this.allotOpen(this.roleId, this.fpName, this.fpJg);
-        } else if (res.data.code == 1001) {
-          this.signOut();
-        } else if (res.data.code == 401) {
-          this.$router.push({ name: "auth" });
-        } else {
-          this.$message({
-            type: "error",
-            message: "分配失败!"
-          });
-        }
-      });
+      console.log(arr)
+      if(!arr.length || !arr) {
+        this.$message({
+          type: "success",
+          message: "分配为空!"
+        });
+        this.assignRoleDetailPop = false;
+        this.assignRolePop = true;
+      }else {
+        let params = {};
+        params["userIds"] = arr.join(",");
+        params["roleId"] = this.roleId;
+        //console.log(params)
+        API.post("/userRole/create", params, {
+          Authorization: storage.get("Token")
+        }).then(res => {
+          //console.log(res.data)
+          if (res.data.code == 200) {
+            this.assignRoleDetailPop = false;
+            this.$message({
+              type: "success",
+              message: "分配成功，需重新登录才起效!"
+            });
+            this.assignRolePop = true;
+            this.allotOpen(this.roleId, this.fpName, this.fpJg);
+          } else if (res.data.code == 1001) {
+            this.signOut();
+          } else if (res.data.code == 401) {
+            this.$router.push({ name: "auth" });
+          } else {
+            this.$message({
+              type: "error",
+              message: "分配失败!"
+            });
+          }
+        });
+      }
     },
     //转换已选人员
     getStaff(list) {
@@ -804,12 +861,12 @@ export default {
           } else if (res.data.code == 10013) {
             this.$message({
               type: "error",
-              message: "有权限不可删除!"
+              message: res.data.message
             });
           } else {
             this.$message({
               type: "error",
-              message: "删除失败!"
+              message: "删除失败!"+ res.data.message
             });
           }
         });

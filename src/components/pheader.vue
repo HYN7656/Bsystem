@@ -121,7 +121,7 @@
         settingPop: false,
         choosePop: false,
         activeName: 'first',
-        userName: storage.getJson('user').uName,
+        userName: storage.getJson('User').uName,
         form: {
           branch: '',
           num: '',
@@ -170,7 +170,7 @@
         }, 1000);
       },
       getAuto() {
-        this.auth = storage.getJson('auth')
+        this.auth = storage.getJson('Auth')
         // console.log(this.auth)
         for (var i = 0; i < this.auth.length; i++) {
           if (this.auth[i] == 1) {

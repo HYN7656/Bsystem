@@ -41,23 +41,12 @@
             </el-table-column>
           </el-table>
         </div>
-        <div class="pagination-box">
-          <el-pagination
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="currentPage"
-            :page-sizes="[10, 50, 100]"
-            :page-size="pageSize"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="total"
-          ></el-pagination>
-        </div>
       </div>
     </div>
     <!--添加-->
-    <el-dialog title="添加菜单" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="添加菜单" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <div class="pop-content">
-        <el-form ref="addObject" :model="addObject" label-width="100px">
+        <el-form ref="addObject" :model="addObject" label-width="100px" :rules="rules">
           <el-form-item label="上级菜单">
             <div class="el-select" readonly="readonly">
               <div class="el-input el-input--suffix">
@@ -66,18 +55,18 @@
                   type="text"
                   readonly="readonly"
                   autocomplete="off"
-                  placeholder="请选择"
+                  placeholder="请选择上级菜单"
                   class="el-input__inner"
                   @click="isBranchPop"
                 >
               </div>
             </div>
           </el-form-item>
-          <el-form-item label="名称">
-            <el-input v-model="addObject.name"></el-input>
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="addObject.name" placeholder="请输入名称"></el-input>
           </el-form-item>
-          <el-form-item label="链接">
-            <el-input v-model="addObject.url"></el-input>
+          <el-form-item label="链接" prop="url">
+            <el-input v-model="addObject.url" placeholder="请输入链接"></el-input>
             <span>点击菜单跳转的页面，如/quarterly/handle/replyExport</span>
           </el-form-item>
           <el-form-item label="图标">
@@ -91,15 +80,15 @@
             </el-radio-group>
             <span>该菜单或操作是否显示到系统菜单中</span>
           </el-form-item>
-          <el-form-item label="权限标识">
-            <el-input v-model="addObject.permission"></el-input>
+          <el-form-item label="权限标识" prop="permission">
+            <el-input v-model="addObject.permission" placeholder="请输入权限标识"></el-input>
             <span>控制器中定义的权限标识，如：replyExport</span>
           </el-form-item>
           <el-form-item label="备注">
-            <el-input type="textarea" v-model="addObject.des"></el-input>
+            <el-input type="textarea" v-model="addObject.des" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="addSave">保存</el-button>
+            <el-button type="primary" @click="addSave('addObject')" :loading='loadingBtn'>保存</el-button>
             <el-button @click="addPop=false">返回</el-button>
           </el-form-item>
         </el-form>
@@ -111,9 +100,10 @@
       :visible.sync="editPop"
       class="tip-dialog"
       :close-on-click-modal="false"
+      :show-close="false"
     >
       <div class="pop-content">
-        <el-form ref="editObject" :model="editObject" label-width="100px">
+        <el-form ref="editObject" :model="editObject" label-width="100px" :rules="rules">
           <el-form-item label="上级菜单">
             <div class="el-select" readonly="readonly">
               <div class="el-input el-input--suffix">
@@ -122,18 +112,18 @@
                   type="text"
                   readonly="readonly"
                   autocomplete="off"
-                  placeholder="请选择"
+                  placeholder="请选择上级菜单"
                   class="el-input__inner"
                   @click="isBranchPop"
                 >
               </div>
             </div>
           </el-form-item>
-          <el-form-item label="名称">
-            <el-input v-model="editObject.name"></el-input>
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="editObject.name" placeholder="请输入名称"></el-input>
           </el-form-item>
-          <el-form-item label="链接">
-            <el-input v-model="editObject.url"></el-input>
+          <el-form-item label="链接" prop="url">
+            <el-input v-model="editObject.url" placeholder="请输入链接"></el-input>
             <span>点击菜单跳转的页面，如/quarterly/handle/replyExport</span>
           </el-form-item>
           <el-form-item label="图标">
@@ -147,15 +137,15 @@
             </el-radio-group>
             <span>该菜单或操作是否显示到系统菜单中</span>
           </el-form-item>
-          <el-form-item label="权限标识">
-            <el-input v-model="editObject.permission"></el-input>
+          <el-form-item label="权限标识" prop="permission">
+            <el-input v-model="editObject.permission" placeholder="请输入权限标识"></el-input>
             <span>控制器中定义的权限标识，如：replyExport</span>
           </el-form-item>
           <el-form-item label="备注">
-            <el-input type="textarea" v-model="editObject.des"></el-input>
+            <el-input type="textarea" v-model="editObject.des" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="editSave">保存</el-button>
+            <el-button type="primary" @click="editSave('editObject')" :loading='loadingBtn'>保存</el-button>
             <el-button @click="editPop=false">返回</el-button>
           </el-form-item>
         </el-form>
@@ -221,15 +211,13 @@ import IconArr from './../../assets/json/icons.json'
 export default {
   data() {
     return {
+      loadingBtn : false,
       editPop: false,
       addPop: false,
       // 上级菜单模态框
       chooseBranchPop: false,
       // icon模态框
       choosePop: false,
-      currentPage: 1,
-      pageSize: 10,
-      total: 0,
       listMenu: [],
       tableData: [],
       addObject: {
@@ -264,6 +252,21 @@ export default {
         children: 'children',
         label: 'label'
       },
+      num : 0,
+      rules: {
+        name: [
+          { required: true, message: '名称必填' },
+          { min: 1, max: 30, message: '长度在 1 到 20 个字符之间', trigger: 'blur' }
+        ],
+        url: [
+          { required: true, message: '链接必填' },
+          { min: 1, max: 30, message: '长度在 1 到 150 个字符之间', trigger: 'blur' }
+        ],
+        permission: [
+          { required: true, message: '权限标识必填' },
+          { min: 1, max: 30, message: '长度在 1 到 150 个字符之间', trigger: 'blur' }
+        ]
+      },
 
     };
   },
@@ -271,15 +274,12 @@ export default {
     // 页面初始化
     getPage() {
       let params = {};
-      params['page'] = this.currentPage;
-      params['count'] = this.pageSize;
       API.get('/menu/findMenuList', params, { Authorization: storage.get('Token') }).then((res) => {
-        //console.log(res.data)
+        // console.log(res.data)
         if (res.data.code == 200) {
-          this.total = res.data.count;
           this.tableData = res.data.data.menuList;
-          var arr = res.data.data.treeList;
-          this.listMenu = this.getOrg(arr);
+          var arr3 = res.data.data.treeList;
+          this.listMenu = this.getOrg(arr3);
         } else if (res.data.code == 1001) {
           this.signOut()
         } else if (res.data.code == 401) {
@@ -303,9 +303,8 @@ export default {
       let params = {};
       params['id'] = id;
       API.get('/menu/findChildList', params, { Authorization: storage.get('Token') }).then((res) => {
-        //console.log(res.data)
+        console.log(res.data)
         if (res.data.code == 200) {
-          this.total = res.data.count;
           this.tableData = res.data.data;
         } else if (res.data.code == 1001) {
           this.signOut()
@@ -321,6 +320,8 @@ export default {
     // 新增
     addMenu() {
       this.addPop = true;
+      this.loadingBtn = false;
+      this.num = 0;
       this.addObject = {
         branch: '',
         pId: '',
@@ -333,41 +334,60 @@ export default {
       }
     },
     // 新增保存
-    addSave() {
-      let params = {};
-      params['pId'] = this.addObject.pId;
-      params['name'] = this.addObject.name;
-      params['url'] = this.addObject.url;
-      params['icon'] = this.addObject.icon;
-      params['hide'] = this.addObject.hide;
-      params['permission'] = this.addObject.permission;
-      params['des'] = this.addObject.des;
-
-      //console.log(params)
-
-      API.post('/menu/addMenuInfo', params, { Authorization: storage.get('Token') }).then((res) => {
-        //console.log(res.data)
-        if (res.data.code == 200) {
-          this.addPop = false;
-          this.getPage();
-          this.$message({
-            type: 'success',
-            message: '新增成功!'
-          });
-        } else if (res.data.code == 1001) {
-          this.signOut()
-        } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
-        } else {
-          this.$message({
-            type: 'error',
-            message: '新增失败!'
-          });
+    addSave(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.num ++;
+          if(this.num == 1) {
+            this.loadingBtn = true;
+            let params = {};
+            if(!this.addObject.pId){
+              params['pId'] = 0
+            }else {
+              params['pId'] = this.addObject.pId;
+            }
+            params['name'] = this.addObject.name;
+            params['url'] = this.addObject.url;
+            params['icon'] = this.addObject.icon;
+            params['hide'] = this.addObject.hide;
+            params['permission'] = this.addObject.permission;
+            params['des'] = this.addObject.des;
+            console.log(params)
+            API.post('/menu/addMenuInfo', params, { Authorization: storage.get('Token') }).then((res) => {
+              console.log(res.data)
+              if (res.data.code == 200) {
+                this.addPop = false;
+                this.getPage();
+                this.$message({
+                  type: 'success',
+                  message: '新增成功!'
+                });
+              } else if (res.data.code == 1001) {
+                this.signOut()
+              } else if (res.data.code == 401) {
+                this.$router.push({ name: 'auth' })
+              } else {
+                this.$message({
+                  type: 'error',
+                  message: '新增失败!'
+                });
+                this.loadingBtn = false;
+                this.num = 0;
+              }
+            })
+          }else{
+            return
+          }
+        }else {
+          this.loadingBtn = false;
+          this.num = 0;
         }
       })
     },
     editOpen(id) {
       this.editPop = true;
+      this.loadingBtn = false;
+      this.num = 0;
       this.editObject = {
         branch: '',
         pId: '',
@@ -397,36 +417,56 @@ export default {
         }
       })
     },
-    editSave() {
-      let params = {};
-      params['sId'] = this.editObject.sId;
-      params['pId'] = this.editObject.pId;
-      params['name'] = this.editObject.name;
-      params['url'] = this.editObject.url;
-      params['icon'] = this.editObject.icon;
-      params['hide'] = this.editObject.hide;
-      params['permission'] = this.editObject.permission;
-      params['des'] = this.editObject.des;
-      //console.log(params)
-      // /menu/updateMenuInfo
-      API.post('/menu/updateMenuInfo', params, { Authorization: storage.get('Token') }).then((res) => {
-        //console.log(res.data)
-        if (res.data.code == 200) {
-          this.editPop = false;
-          this.getPage();
-          this.$message({
-            type: 'success',
-            message: '编辑成功!'
-          });
-        } else if (res.data.code == 1001) {
-          this.signOut()
-        } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
-        } else {
-          this.$message({
-            type: 'error',
-            message: '编辑失败!'
-          });
+    editSave(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.num ++;
+          if(this.num == 1) {
+            this.loadingBtn = true;
+            let params = {};
+            params['sId'] = this.editObject.sId;
+            if(!this.editObject.pId){
+              params['pId'] = 0
+            }else {
+              params['pId'] = this.editObject.pId;
+            }
+            params['name'] = this.editObject.name;
+            params['url'] = this.editObject.url;
+            params['icon'] = this.editObject.icon;
+            params['hide'] = this.editObject.hide;
+            params['permission'] = this.editObject.permission;
+            params['des'] = this.editObject.des;
+            //console.log(params)
+            // /menu/updateMenuInfo
+            API.post('/menu/updateMenuInfo', params, { Authorization: storage.get('Token') }).then((res) => {
+              //console.log(res.data)
+              if (res.data.code == 200) {
+                this.editPop = false;
+                this.getPage();
+                this.$message({
+                  type: 'success',
+                  message: '编辑成功!'
+                });
+              } else if (res.data.code == 1001) {
+                this.signOut()
+              } else if (res.data.code == 401) {
+                this.$router.push({ name: 'auth' })
+              } else {
+                this.$message({
+                  type: 'error',
+                  message: '编辑失败!'
+                });
+                this.loadingBtn = false;
+                this.num = 0;
+              }
+            })
+          }else{
+            return;
+          }
+
+        }else {
+          this.loadingBtn = false;
+          this.num = 0;
         }
       })
     },
@@ -496,17 +536,6 @@ export default {
           }
         })
       })
-    },
-    // 翻页器
-    handleSizeChange(val) {
-      //console.log(val);
-      this.pageSize = val;
-      this.getPage();
-    },
-    handleCurrentChange(val) {
-      //console.log(val);
-      this.currentPage = val;
-      this.getPage()
     },
     signOut() {
       this.$message({

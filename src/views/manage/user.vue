@@ -6,7 +6,7 @@
         <el-tree
           :data="listOrgAll"
           :props="defaultProps"
-          @node-click="OrgTreeClick"
+          @node-click="getPageCount"
           :expand-on-click-node="false"
           :default-expand-all="true"
         ></el-tree>
@@ -47,6 +47,7 @@
                     class="el-input__inner"
                     @click="choosePop=true"
                   >
+                  <span class="del-span" @click="delSpan">x</span>
                 </div>
               </div>
             </el-col>
@@ -93,7 +94,7 @@
       </div>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
       <div class="pop-content">
         <el-form ref="addObject" :model="addObject" label-width="100px" status-icon :rules="rules">
           <el-row :gutter="20">
@@ -122,7 +123,7 @@
                       type="text"
                       readonly="readonly"
                       autocomplete="off"
-                      placeholder="请选择"
+                      placeholder="请选择归属部门"
                       class="el-input__inner"
                       @click="choosePop = true"
                     >
@@ -134,43 +135,43 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="姓名" prop="uusername">
-                <el-input v-model="addObject.uusername"></el-input>
+                <el-input v-model="addObject.uusername" placeholder="请输入姓名"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="登录名" prop="uname">
-                <el-input v-model="addObject.uname"></el-input>
+                <el-input v-model="addObject.uname"  placeholder="请输入登录名"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="密码" prop="upasswd">
-                <el-input type="password" v-model="addObject.upasswd" autocomplete="off"></el-input>
+                <el-input type="password" v-model="addObject.upasswd" autocomplete="off"  placeholder="请输入密码"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="确认密码" prop="confirmPas">
-                <el-input type="password" v-model="addObject.confirmPas" autocomplete="off"></el-input>
+                <el-input type="password" v-model="addObject.confirmPas" autocomplete="off" placeholder="请再次输入密码"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="电话" prop="utelephone">
-                <el-input v-model="addObject.utelephone"></el-input>
+                <el-input v-model="addObject.utelephone" placeholder="请输入电话"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="手机" prop="umobilephone">
-                <el-input v-model="addObject.umobilephone"></el-input>
+                <el-input v-model="addObject.umobilephone" placeholder="请输入手机号"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="邮箱" prop="uemail">
-                <el-input v-model="addObject.uemail"></el-input>
+                <el-input v-model="addObject.uemail" placeholder="请输入邮箱"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -182,17 +183,18 @@
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="用户角色">
+          <div class="userBox">
+            <span><span style="color: #f56c6c">*</span>用户角色</span>
             <el-checkbox-group v-model="checkedRole" @change="AddhandleChecked">
               <el-checkbox v-for="p in power" :label="p.roleName" :key="p.id">{{p.roleName}}</el-checkbox>
             </el-checkbox-group>
-          </el-form-item>
+          </div>
 
           <el-form-item label="备注">
-            <el-input type="textarea" v-model="addObject.ucontent"></el-input>
+            <el-input type="textarea" v-model="addObject.ucontent" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item class="btn">
-            <el-button type="primary" @click="addSave('addObject')">保存</el-button>
+            <el-button type="primary" @click="addSave('addObject')" :loading='loadingBtn'>保存</el-button>
             <el-button @click="addPop = false">返回</el-button>
           </el-form-item>
         </el-form>
@@ -204,6 +206,7 @@
       :visible.sync="editPop"
       class="tip-dialog"
       :close-on-click-modal="false"
+      :show-close="false"
     >
       <div class="pop-content">
         <el-form
@@ -239,7 +242,7 @@
                       type="text"
                       readonly="readonly"
                       autocomplete="off"
-                      placeholder="请选择"
+                      placeholder="请选择归属部门"
                       class="el-input__inner"
                       @click="udeClick"
                     >
@@ -251,19 +254,19 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="姓名" prop="uusername">
-                <el-input v-model="editObject.uusername"></el-input>
+                <el-input v-model="editObject.uusername" placeholder="请输入姓名"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="登录名" prop="uname">
-                <el-input v-model="editObject.uname"></el-input>
+                <el-input v-model="editObject.uname" placeholder="请输入登录名" :disabled="true"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="重置密码">
-                <el-input v-model="editObject.ResetPasswd"></el-input>
+                <el-input v-model="editObject.ResetPasswd" placeholder="请输入重置密码"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12"></el-col>
@@ -271,7 +274,7 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="邮箱" prop="uemail">
-                <el-input v-model="editObject.uemail"></el-input>
+                <el-input v-model="editObject.uemail" placeholder="请输入邮箱"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
@@ -286,25 +289,27 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="电话" prop="utelephone">
-                <el-input v-model="editObject.utelephone"></el-input>
+                <el-input v-model="editObject.utelephone" placeholder="请输入电话"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="手机" prop="umobilephone">
-                <el-input v-model="editObject.umobilephone"></el-input>
+                <el-input v-model="editObject.umobilephone" placeholder="请输入手机号"></el-input>
               </el-form-item>
             </el-col>
           </el-row>
-          <el-form-item label="用户角色">
-            <el-checkbox-group v-model="checkedRoleEdit" @change="EdithandleChecked">
-              <el-checkbox v-for="p in power" :label="p.roleName" :key="p.id">{{p.roleName}}</el-checkbox>
-            </el-checkbox-group>
-          </el-form-item>
+            <div class="userBox">
+              <span><span style="color: #f56c6c">*</span>用户角色</span>
+              <el-checkbox-group v-model="checkedRoleEdit" @change="EdithandleChecked">
+                <el-checkbox v-for="p in power" :label="p.roleName" :key="p.id">{{p.roleName}}</el-checkbox>
+              </el-checkbox-group>
+            </div>
+
           <el-form-item label="备注">
-            <el-input type="textarea" v-model="editObject.ucontent"></el-input>
+            <el-input type="textarea" v-model="editObject.ucontent" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item class="btn">
-            <el-button type="primary" @click="editSave('editObject')">保存</el-button>
+            <el-button type="primary" @click="editSave('editObject')" :loading='loadingBtn'>保存</el-button>
             <el-button @click="editPop = false">返回</el-button>
           </el-form-item>
         </el-form>
@@ -330,10 +335,10 @@
           :expand-on-click-node="false"
         ></el-tree>
       </div>
-      <div class="pop-btn">
+      <!--<div class="pop-btn">
         <el-button type="success" @click="confirmChooseBranch">确定</el-button>
         <el-button type="info" @click="choosePop = false">取消</el-button>
-      </div>
+      </div>-->
     </el-dialog>
   </div>
 </template>
@@ -343,9 +348,6 @@ import md5 from 'js-md5';
 export default {
   data() {
     var checkPhone = (rule, value, callback) => {
-      if (!value) {
-        return;
-      } else {
         const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
         ////console.log(reg.test(value));
         if (reg.test(value)) {
@@ -353,7 +355,6 @@ export default {
         } else {
           return callback(new Error('请输入正确的手机号'));
         }
-      }
     };
     var validatePass2 = (rule, value, callback) => {
       if (value === '') {
@@ -365,6 +366,7 @@ export default {
       }
     };
     return {
+      loadingBtn : false,
       editPop: false,
       addPop: false,
       choosePop: false,
@@ -381,12 +383,8 @@ export default {
       currentPage: 1,
       pageSize: 10,
       total: 0,
-
-
       middleChooseBranch: '',
       filterText: '',
-
-
       udepartmentName: '',
       udepartmentId: '',
       addObject: {
@@ -421,10 +419,12 @@ export default {
       tableData: [],
       rules: {
         uusername: [
-          { required: true, message: '必填', trigger: 'blur' },
+          { required: true, message: '姓名必填', trigger: 'blur' },
+          { min: 1, max: 20, message: '长度在 1 到 20 个字符之间', trigger: 'blur' }
         ],
         uname: [
-          { required: true, message: '必填', trigger: 'blur' },
+          { required: true, message: '登录名必填', trigger: 'blur' },
+          { min: 1, max: 20, message: '长度在 1 到 20 个字符之间', trigger: 'blur' }
         ],
         upasswd: [
           { required: true, message: '请输入密码', trigger: 'blur' },
@@ -436,14 +436,15 @@ export default {
           { min: 6, message: '长度至少6位', trigger: 'blur' }
         ],
         uemail: [
-          { required: true, message: '必填', trigger: 'blur' },
+          { required: true, message: '邮箱必填', trigger: 'blur' },
+          { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' }
         ],
         umobilephone: [
           { validator: checkPhone, trigger: 'blur' },
-          { required: true, message: '必填', trigger: 'blur' },
+          { required: true, message: '手机必填', trigger: 'blur' },
         ],
         utelephone: [
-          { required: true, message: '必填', trigger: 'blur' },
+          { required: true, message: '电话必填', trigger: 'blur' },
         ],
         urole: [
           { type: 'array', required: true, message: '请至少选择角色', trigger: 'change' }
@@ -457,7 +458,10 @@ export default {
         children: 'children',
         label: 'label'
       },
-      listOrgArr: []
+      listOrgArr: [],
+      num : 0,
+      UName : '',
+      PageContID : ''
 
     };
   },
@@ -485,6 +489,12 @@ export default {
         }
       })
     },
+    // 点击左侧树展示列表翻页器控制
+    getPageCount(data){
+      this.pageSize = 10;
+      this.currentPage = 1;
+      this.OrgTreeClick(data);
+    },
     // 左侧树刷新列表
     OrgTreeClick(data) {
       var arr = []
@@ -493,12 +503,15 @@ export default {
           arr.push(this.listOrgArr[i])
         }
       }
+      this.PageContID = data;
       if (arr.length > 0) {
         let params = {};
         params['uMechanism'] = data.id;
         params['uDepartment'] = '';
         params['uName'] = '';
         params['uUsername'] = '';
+        params['page'] = this.currentPage;
+        params['count'] = this.pageSize;
         API.get('/user/findByName', params, { Authorization: storage.get('Token') }).then((res) => {
           //console.log(res.data)
           if (res.data.code == 200) {
@@ -516,6 +529,8 @@ export default {
         params['uDepartment'] = data.id;
         params['uName'] = '';
         params['uUsername'] = '';
+        params['page'] = this.currentPage;
+        params['count'] = this.pageSize;
         API.get('/user/findByName', params, { Authorization: storage.get('Token') }).then((res) => {
           //console.log(res.data)
           if (res.data.code == 200) {
@@ -551,9 +566,11 @@ export default {
     },
     // 加载归属部门
     getDepartment(id) {
+      console.log(id)
+      this.udepartmentName = '';
       let params = {};
       params['id'] = id;
-      API.get('/mechanism/findById', params, { Authorization: storage.get('Token') }).then((res) => {
+      API.get('/mechanism/findByMid', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           var arr = res.data.data;
@@ -601,7 +618,7 @@ export default {
       params['uDepartment'] = this.udepartmentId;
       params['uName'] = this.search.loginName;
       params['uUsername'] = this.search.Name;
-      //console.log(params)
+      console.log(params)
       API.get('/user/findByName', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
@@ -614,6 +631,11 @@ export default {
         }
       })
     },
+    // 清除归属部门
+    delSpan(){
+      this.udepartmentName = ''
+      this.udepartmentId = ''
+    },
     // 搜索部门取值
     handleNodeClick(data) {
       this.search.branch = data.label;
@@ -621,6 +643,8 @@ export default {
     // 新增
     addUser() {
       this.addPop = true;
+      this.loadingBtn = false;
+      this.num = 0;
       this.addObject = {
         umechanism: '',
         // udepartment: '',
@@ -647,45 +671,64 @@ export default {
     },
     // 新增保存
     addSave(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          let params = {};
-          params['uMechanism'] = this.addObject.umechanism;
-          params['uDepartment'] = this.udepartmentId;
-          params['uUsername'] = this.addObject.uusername;
-          params['uName'] = this.addObject.uname;
-          params['uPasswd'] = md5(this.addObject.uname + this.addObject.upasswd);
-          // params['confirmPas'] = this.addObject.confirmPas;
-          params['uEmail'] = this.addObject.uemail;
-          params['uTelephone'] = this.addObject.utelephone;
-          params['uMobilephone'] = this.addObject.umobilephone;
-          params['uRole'] = this.addObject.urole;
-          params['uContent'] = this.addObject.ucontent;
-          params['uSpecialUser'] = this.tsUserAdd;
+      if(!this.addObject.urole || !this.addObject.urole.length){
+        this.$message({
+          type: 'error',
+          message: '用户角色必选'
+        });
+      }else {
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            this.num ++;
+            if(this.num == 1) {
+              this.loadingBtn = true;
+              let params = {};
+              params['uMechanism'] = this.addObject.umechanism;
+              params['uDepartment'] = this.udepartmentId;
+              params['uUsername'] = this.addObject.uusername;
+              params['uName'] = this.addObject.uname;
+              params['uPasswd'] = md5(this.addObject.uname + this.addObject.upasswd);
+              // params['confirmPas'] = this.addObject.confirmPas;
+              params['uEmail'] = this.addObject.uemail;
+              params['uTelephone'] = this.addObject.utelephone;
+              params['uMobilephone'] = this.addObject.umobilephone;
+              params['uRole'] = this.addObject.urole;
+              params['uContent'] = this.addObject.ucontent;
+              params['uSpecialUser'] = this.tsUserAdd;
 
-          // console.log(params)
-          API.post('/user/create', params, { Authorization: storage.get('Token') }).then((res) => {
-            // console.log(res.data)
-            if (res.data.code == 200) {
-              this.addPop = false;
-              this.getPage();
-              this.$message({
-                type: 'success',
-                message: '新增成功!'
-              });
-            } else if (res.data.code == 1001) {
-              this.signOut()
-            } else if (res.data.code == 401) {
-              this.$router.push({ name: 'auth' })
-            } else {
-              console.log(res);
-              this.$message({
-                type: 'error',
-                message: res.data.message
-              });
+              // console.log(params)
+              API.post('/user/create', params, { Authorization: storage.get('Token') }).then((res) => {
+                // console.log(res.data)
+                if (res.data.code == 200) {
+                  this.addPop = false;
+                  this.getPage();
+                  this.$message({
+                    type: 'success',
+                    message: '新增成功!'
+                  });
+                } else if (res.data.code == 1001) {
+                  this.signOut()
+                } else if (res.data.code == 401) {
+                  this.$router.push({ name: 'auth' })
+                } else {
+                  console.log(res);
+                  this.$message({
+                    type: 'error',
+                    message: res.data.message
+                  });
+                  this.loadingBtn = false;
+                  this.num = 0;
+                }
+              })
+            }else {
+              return
             }
-          })
-        }      })
+          } else {
+            this.loadingBtn = false;
+            this.num = 0;
+          }
+        })
+      }
     },
     // 新增角色
     AddhandleChecked() {
@@ -704,6 +747,8 @@ export default {
         this.$refs.editObject.clearValidate();
       }
       this.editPop = true;
+      this.loadingBtn = false;
+      this.num = 0;
       this.checkedRoleEdit = [];
       this.editObject = {
         umechanism: '',
@@ -723,12 +768,14 @@ export default {
       this.udepartmentName = '';
       this.udepartmentId = '';
       this.listOrg = [];
+      this.EditID = id;
       let params = {};
       params['id'] = id;
       API.get('/user/findById', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data;
+          this.UName = this.editObject.uname;
           this.tsUserEdit = res.data.data.uspecialUser.toString();
           var obj = res.data.data;
           if (obj.urole) {
@@ -769,47 +816,148 @@ export default {
     },
     // 编辑保存
     editSave(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          let params = {};
-          params['uId'] = this.editObject.id;
-          params['uMechanism'] = this.editObject.umechanism;
-          params['uDepartment'] = this.udepartmentId;
-          params['uUsername'] = this.editObject.uusername;
-          params['uName'] = this.editObject.uname;
-          if (this.editObject.ResetPasswd) {
-            params['uPasswd'] = md5(this.editObject.uname + this.editObject.ResetPasswd);
-          } else {
-            params['uPasswd'] = this.editObject.ResetPasswd;
-          }
-          params['uEmail'] = this.editObject.uemail;
-          params['uTelephone'] = this.editObject.utelephone;
-          params['uMobilephone'] = this.editObject.umobilephone;
-          params['uRole'] = this.editObject.urole;
-          params['uContent'] = this.editObject.ucontent;
-          params['uSpecialUser'] = this.tsUserEdit;
-          // console.log(params)
-          API.post('/user/update', params, { Authorization: storage.get('Token') }).then((res) => {
-            //console.log(res.data)
-            if (res.data.code == 200) {
-              this.editPop = false;
-              this.getPage();
-              this.$message({
-                type: 'success',
-                message: '编辑成功!'
-              });
-            } else if (res.data.code == 1001) {
-              this.signOut()
-            } else if (res.data.code == 401) {
-              this.$router.push({ name: 'auth' })
-            } else {
-              this.$message({
-                type: 'error',
-                message: '编辑失败!'
-              });
+      // 角色必选
+      if(!this.editObject.urole || !this.editObject.urole.length){
+        this.$message({
+          type: 'error',
+          message: '用户角色必选'
+        });
+      }else {
+
+        // 进行表单校验
+        this.$refs[formName].validate((valid) => {
+          if (valid) {
+            // 判断编辑的用户名是否有改变，如果无改变正常请求，如果有改变则请求后台接口判断是否重名
+            console.log(this.UName)
+            console.log(this.editObject.uname)
+            if(this.UName == this.editObject.uname){
+              // alert('一样')
+              // 控制每个按钮只能点击一次
+              this.num ++;
+              if(this.num == 1) {
+                this.loadingBtn = true;
+                let params = {};
+                params['uId'] = this.editObject.id;
+                params['uMechanism'] = this.editObject.umechanism;
+                params['uDepartment'] = this.udepartmentId;
+                params['uUsername'] = this.editObject.uusername;
+                params['uName'] = this.editObject.uname;
+                if (this.editObject.ResetPasswd) {
+                  params['uPasswd'] = md5(this.editObject.uname + this.editObject.ResetPasswd);
+                } else {
+                  params['uPasswd'] = this.editObject.ResetPasswd;
+                }
+                params['uEmail'] = this.editObject.uemail;
+                params['uTelephone'] = this.editObject.utelephone;
+                params['uMobilephone'] = this.editObject.umobilephone;
+                params['uRole'] = this.editObject.urole;
+
+                params['uContent'] = this.editObject.ucontent;
+                params['uSpecialUser'] = this.tsUserEdit;
+                // console.log(params)
+                API.post('/user/update', params, { Authorization: storage.get('Token') }).then((res) => {
+                  //console.log(res.data)
+                  if (res.data.code == 200) {
+                    this.editPop = false;
+                    this.getPage();
+                    this.$message({
+                      type: 'success',
+                      message: '编辑成功，重新登录系统生效!'
+                    });
+                  } else if (res.data.code == 1001) {
+                    this.signOut()
+                  } else if (res.data.code == 401) {
+                    this.$router.push({ name: 'auth' })
+                  } else {
+                    this.$message({
+                      type: 'error',
+                      message: '编辑失败!'+ res.data.message
+                    });
+                    this.loadingBtn = false;
+                    this.num = 0;
+                  }
+                })
+            }else {
+              return;
+              }
+            }else {
+              // alert("不一样")
+              var name = {}
+              name['name'] = this.editObject.uname;
+              API.get('/user/shiroByName', name, {Authorization: storage.get('Token')}).then((res) => {
+                console.log(res.data)
+                if (res.data.code == 200) {
+                  // alert('不一样+成功')
+                  // 控制每个按钮只能点击一次
+                  this.num ++;
+                  if(this.num == 1) {
+                    this.loadingBtn = true;
+                    let params = {};
+                    params['uId'] = this.editObject.id;
+                    params['uMechanism'] = this.editObject.umechanism;
+                    params['uDepartment'] = this.udepartmentId;
+                    params['uUsername'] = this.editObject.uusername;
+                    params['uName'] = this.editObject.uname;
+                    if (this.editObject.ResetPasswd) {
+                      params['uPasswd'] = md5(this.editObject.uname + this.editObject.ResetPasswd);
+                    } else {
+                      params['uPasswd'] = this.editObject.ResetPasswd;
+                    }
+                    params['uEmail'] = this.editObject.uemail;
+                    params['uTelephone'] = this.editObject.utelephone;
+                    params['uMobilephone'] = this.editObject.umobilephone;
+                    params['uRole'] = this.editObject.urole;
+
+                    params['uContent'] = this.editObject.ucontent;
+                    params['uSpecialUser'] = this.tsUserEdit;
+                    // console.log(params)
+                    API.post('/user/update', params, { Authorization: storage.get('Token') }).then((res) => {
+                      //console.log(res.data)
+                      if (res.data.code == 200) {
+                        this.editPop = false;
+                        this.getPage();
+                        this.$message({
+                          type: 'success',
+                          message: '编辑成功!'
+                        });
+                      } else if (res.data.code == 1001) {
+                        this.signOut()
+                      } else if (res.data.code == 401) {
+                        this.$router.push({ name: 'auth' })
+                      } else {
+                        this.$message({
+                          type: 'error',
+                          message: '编辑失败!'+ res.data.message
+                        });
+                        this.loadingBtn = false;
+                        this.num = 0;
+                      }
+                    })
+                  }else {
+                    // alert(1)
+                    return;
+                  }
+                }else if (res.data.code == 1001) {
+                  this.signOut()
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '编辑失败!' + res.data.message
+                  });
+                  this.loadingBtn = false;
+                  this.num = 0;
+                  // alert(2)
+                }
+              })
             }
-          })
-        }      })
+          }else {
+            this.loadingBtn = false;
+            this.num = 0;
+          }
+        })
+
+      }
+
     },
     // 编辑部门模态框树展示
     udeClick() {
@@ -851,7 +999,7 @@ export default {
           } else {
             this.$message({
               type: 'error',
-              message: '删除失败!'
+              message: '删除失败!'+ res.data.message
             });
           }
         })
@@ -866,14 +1014,14 @@ export default {
       this.choosePop = false;
     },
 
-    confirmChooseBranch() {
+    /*confirmChooseBranch() {
       if (this.addPop) {
         this.form.branch = this.middleChooseBranch;
       } else {
         this.search.branch = this.middleChooseBranch;
       }
       this.choosePop = false
-    },
+    },*/
     filterNode(value, data) {
       if (!value) return true;
       return data.label.indexOf(value) !== -1;
@@ -882,12 +1030,21 @@ export default {
     handleSizeChange(val) {
       //console.log(val);
       this.pageSize = val;
-      this.getPage();
+      if(this.PageContID == ''){
+        this.getPage();
+      }else {
+        this.OrgTreeClick(this.PageContID)
+      }
+
     },
     handleCurrentChange(val) {
       //console.log(val);
       this.currentPage = val;
-      this.getPage()
+      if(this.PageContID == ''){
+        this.getPage();
+      }else {
+        this.OrgTreeClick(this.PageContID)
+      }
     },
 
     signOut() {
@@ -913,11 +1070,28 @@ export default {
     this.getPage();
     this.getAffiliate();
     this.getTree();
+    // this.abc();
 
   }
 };
 </script>
 <style>
+  .del-span {
+    position: absolute;
+    right: 12px;
+    top: 9px;
+    color: #c0c4cc;
+    cursor: pointer;
+  }
+  .userBox {
+    margin: 0 0 15px 27px;
+  }
+  .userBox > span {
+    margin-bottom: 15px;
+    display: block;
+    float: left;
+    margin-right: 10px;
+  }
 .user-page .el-select {
   width: 100%;
 }

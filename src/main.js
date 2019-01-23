@@ -19,8 +19,8 @@ window.storage = storage;
 if (storage.getJson("bsumIP")) {
   config.baseURL = storage.getJson("bsumIP");
   initVue();//创建vue实例
-  console.log(router);
-  console.log(router.options);
+  // console.log(router);
+  // console.log(router.options);
   // router.push("/");
 } else {
   axios.get("config/app-config.json").then((result) => {
