@@ -348,7 +348,7 @@ import md5 from 'js-md5';
 export default {
   data() {
     var checkPhone = (rule, value, callback) => {
-        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/;
         ////console.log(reg.test(value));
         if (reg.test(value)) {
           callback();
@@ -473,7 +473,7 @@ export default {
         //console.log(res.data)
         if (res.data.code == 200) {
           var arr = res.data.data;
-          this.listOrgAll = this.getOrg(arr)
+          this.listOrgAll = this.getOrg(arr);
           this.listOrg = this.getOrg(arr);
           //console.log(this.listOrgAll)
           var arr = [];
@@ -483,9 +483,9 @@ export default {
           //console.log(arr)
           this.listOrgArr = arr;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -497,10 +497,10 @@ export default {
     },
     // 左侧树刷新列表
     OrgTreeClick(data) {
-      var arr = []
+      var arr = [];
       for (var i = 0; i < this.listOrgArr.length; i++) {
         if (data.id == this.listOrgArr[i]) {
-          arr.push(this.listOrgArr[i])
+          arr.push(this.listOrgArr[i]);
         }
       }
       this.PageContID = data;
@@ -518,9 +518,9 @@ export default {
             this.total = res.data.count;
             this.tableData = res.data.data;
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else if (res.data.code == 401) {
-            this.$router.push({ name: 'auth' })
+            this.$router.push({ name: 'auth' });
           }
         })
       } else {
@@ -537,9 +537,9 @@ export default {
             this.total = res.data.count;
             this.tableData = res.data.data;
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else if (res.data.code == 401) {
-            this.$router.push({ name: 'auth' })
+            this.$router.push({ name: 'auth' });
           }
         })
       }
@@ -558,15 +558,15 @@ export default {
           //console.log(role)
           this.power = role;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
     // 加载归属部门
     getDepartment(id) {
-      console.log(id)
+      // console.log(id)
       this.udepartmentName = '';
       let params = {};
       params['id'] = id;
@@ -574,10 +574,10 @@ export default {
         //console.log(res.data)
         if (res.data.code == 200) {
           var arr = res.data.data;
-          this.listOrg = this.getOrg(arr)
+          this.listOrg = this.getOrg(arr);
           //console.log(this.listOrg)
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         }/*else if(res.data.code == 401){
             this.$router.push({name: 'auth'})
           }*/
@@ -605,9 +605,9 @@ export default {
           this.total = res.data.count;
           this.tableData = res.data.data;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -618,23 +618,23 @@ export default {
       params['uDepartment'] = this.udepartmentId;
       params['uName'] = this.search.loginName;
       params['uUsername'] = this.search.Name;
-      console.log(params)
+      // console.log(params)
       API.get('/user/findByName', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
           this.tableData = res.data.data;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
     // 清除归属部门
     delSpan(){
-      this.udepartmentName = ''
-      this.udepartmentId = ''
+      this.udepartmentName = '';
+      this.udepartmentId = '';
     },
     // 搜索部门取值
     handleNodeClick(data) {
@@ -666,7 +666,7 @@ export default {
       if (this.$refs.addObject) {
         this.$refs.addObject.clearValidate();
       } else {
-        return
+        return;
       }
     },
     // 新增保存
@@ -707,11 +707,11 @@ export default {
                     message: '新增成功!'
                   });
                 } else if (res.data.code == 1001) {
-                  this.signOut()
+                  this.signOut();
                 } else if (res.data.code == 401) {
-                  this.$router.push({ name: 'auth' })
+                  this.$router.push({ name: 'auth' });
                 } else {
-                  console.log(res);
+                  // console.log(res);
                   this.$message({
                     type: 'error',
                     message: res.data.message
@@ -721,7 +721,7 @@ export default {
                 }
               })
             }else {
-              return
+              return;
             }
           } else {
             this.loadingBtn = false;
@@ -736,7 +736,7 @@ export default {
       for (var i = 0; i < this.power.length; i++) {
         for (var j = 0; j < this.checkedRole.length; j++) {
           if (this.power[i].roleName == this.checkedRole[j]) {
-            this.addObject.urole.push(this.power[i].id)
+            this.addObject.urole.push(this.power[i].id);
           }
         }
       }
@@ -780,7 +780,7 @@ export default {
           var obj = res.data.data;
           if (obj.urole) {
             // 角色显示
-            var arr = obj.urole.split(',')
+            var arr = obj.urole.split(',');
             for (var i = 0; i < arr.length; i++) {
               for (var j = 0; j < this.power.length; j++) {
                 if (arr[i] == this.power[j].roleName) {
@@ -796,7 +796,7 @@ export default {
           for (var i = 0; i < this.OrgOpt.length; i++) {
             if (this.OrgOpt[i].mName == umechanismName) {
               // 转换为机构id
-              this.editObject.umechanism = this.OrgOpt[i].id
+              this.editObject.umechanism = this.OrgOpt[i].id;
             }
           }
 
@@ -808,9 +808,9 @@ export default {
             this.editObject.urole = obj.uroleId.split(',');
           }
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -828,10 +828,7 @@ export default {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             // 判断编辑的用户名是否有改变，如果无改变正常请求，如果有改变则请求后台接口判断是否重名
-            console.log(this.UName)
-            console.log(this.editObject.uname)
             if(this.UName == this.editObject.uname){
-              // alert('一样')
               // 控制每个按钮只能点击一次
               this.num ++;
               if(this.num == 1) {
@@ -865,9 +862,9 @@ export default {
                       message: '编辑成功，重新登录系统生效!'
                     });
                   } else if (res.data.code == 1001) {
-                    this.signOut()
+                    this.signOut();
                   } else if (res.data.code == 401) {
-                    this.$router.push({ name: 'auth' })
+                    this.$router.push({ name: 'auth' });
                   } else {
                     this.$message({
                       type: 'error',
@@ -881,13 +878,10 @@ export default {
               return;
               }
             }else {
-              // alert("不一样")
-              var name = {}
+              var name = {};
               name['name'] = this.editObject.uname;
               API.get('/user/shiroByName', name, {Authorization: storage.get('Token')}).then((res) => {
-                console.log(res.data)
                 if (res.data.code == 200) {
-                  // alert('不一样+成功')
                   // 控制每个按钮只能点击一次
                   this.num ++;
                   if(this.num == 1) {
@@ -921,9 +915,9 @@ export default {
                           message: '编辑成功!'
                         });
                       } else if (res.data.code == 1001) {
-                        this.signOut()
+                        this.signOut();
                       } else if (res.data.code == 401) {
-                        this.$router.push({ name: 'auth' })
+                        this.$router.push({ name: 'auth' });
                       } else {
                         this.$message({
                           type: 'error',
@@ -934,11 +928,10 @@ export default {
                       }
                     })
                   }else {
-                    // alert(1)
                     return;
                   }
                 }else if (res.data.code == 1001) {
-                  this.signOut()
+                  this.signOut();
                 } else {
                   this.$message({
                     type: 'error',
@@ -946,7 +939,6 @@ export default {
                   });
                   this.loadingBtn = false;
                   this.num = 0;
-                  // alert(2)
                 }
               })
             }
@@ -962,7 +954,7 @@ export default {
     // 编辑部门模态框树展示
     udeClick() {
       this.choosePop = true;
-      this.getDepartment(this.editObject.umechanism)
+      this.getDepartment(this.editObject.umechanism);
     },
     // 编辑角色
     EdithandleChecked(val) {
@@ -971,7 +963,7 @@ export default {
       for (var i = 0; i < this.power.length; i++) {
         for (var j = 0; j < chekc.length; j++) {
           if (this.power[i].roleName == chekc[j]) {
-            this.editObject.urole.push(this.power[i].id)
+            this.editObject.urole.push(this.power[i].id);
           }
         }
       }
@@ -993,23 +985,23 @@ export default {
               message: '删除成功!'
             });
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else if (res.data.code == 401) {
-            this.$router.push({ name: 'auth' })
+            this.$router.push({ name: 'auth' });
           } else {
             this.$message({
               type: 'error',
               message: '删除失败!'+ res.data.message
             });
           }
-        })
-      })
+        });
+      });
     },
 
     // 新增编辑部门取值
     chooseNodeClick(data) {
       //console.log(data)
-      this.udepartmentName = data.label
+      this.udepartmentName = data.label;
       this.udepartmentId = data.id;
       this.choosePop = false;
     },
@@ -1033,7 +1025,7 @@ export default {
       if(this.PageContID == ''){
         this.getPage();
       }else {
-        this.OrgTreeClick(this.PageContID)
+        this.OrgTreeClick(this.PageContID);
       }
 
     },
@@ -1043,7 +1035,7 @@ export default {
       if(this.PageContID == ''){
         this.getPage();
       }else {
-        this.OrgTreeClick(this.PageContID)
+        this.OrgTreeClick(this.PageContID);
       }
     },
 
@@ -1056,7 +1048,7 @@ export default {
       storage.delete('Auth');
       storage.delete('Token');
       storage.delete('User');
-      this.$router.push({ name: 'login' })
+      this.$router.push({ name: 'login' });
     }
 
 

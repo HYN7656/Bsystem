@@ -12,8 +12,8 @@
 </template>
 
 <script>
-  import PHeader from '../../components/pheader'
-  import PFooter from '../../components/pfooter.vue'
+  import PHeader from '../../components/pheader';
+  import PFooter from '../../components/pfooter.vue';
   export default {
     name: '',
     components:{ PHeader,PFooter },

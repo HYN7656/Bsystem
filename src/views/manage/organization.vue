@@ -275,12 +275,12 @@ export default {
         // console.log(res.data)
         if (res.data.code == 200) {
           var arr = res.data.data;
-          this.listOrg = this.getOrg(arr)
+          this.listOrg = this.getOrg(arr);
           // console.log(this.listOrg)
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -293,7 +293,7 @@ export default {
     },
     // 树选择机构
     chooseNodeClick(data) {
-      console.log(data)
+      // console.log(data)
       this.OrgMId = data.mId;
       this.OrgName = data.label;
       this.OrgId = data.id;
@@ -301,20 +301,20 @@ export default {
     },
     // 通过左侧树选择后展示右侧列表
     getAllTreeList(data) {
-      console.log(this.PageContID.id)
+      // console.log(this.PageContID.id);
       let params = {};
       params['id'] = data.id;
       params['page'] = this.currentPage;
       params['count'] = this.pageSize;
       API.get('/mechanism/findById', params, { Authorization: storage.get('Token') }).then((res) => {
-        console.log(res.data)
+        // console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
           this.tableData = res.data.data;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -334,9 +334,9 @@ export default {
           this.tableData = res.data.data;
           this.getTree();
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -393,7 +393,7 @@ export default {
             params['mEmail'] = this.addObject.mEmail;
             params['mContent'] = this.addObject.mContent;
 
-            console.log(params)
+            // console.log(params)
             API.post('/mechanism/create', params, { Authorization: storage.get('Token') }).then((res) => {
               if (res.data.code == 200) {
                 this.addPop = false;
@@ -403,7 +403,7 @@ export default {
                   message: '新增成功!'
                 });
               } else if (res.data.code == 1001) {
-                this.signOut()
+                this.signOut();
               } else if (res.data.code == 401) {
                 this.$router.push({ name: 'auth' })
               } else {
@@ -426,8 +426,8 @@ export default {
     },
     // 清除上级机构
     delSpan(){
-      this.OrgName = ''
-      this.OrgId = 0
+      this.OrgName = '';
+      this.OrgId = 0;
     },
     // 编辑
     editOpen(id) {
@@ -457,16 +457,16 @@ export default {
         // console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data[0];
-          console.log(this.editObject)
+          // console.log(this.editObject)
           var obj = res.data.data[0];
 
           // 机构显示名称
           this.OrgName = obj.superiorName;
           this.OrgId = obj.mid;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -496,7 +496,7 @@ export default {
             params['mEmail'] = this.editObject.mEmail;
             params['mContent'] = this.editObject.mContent;
 
-            console.log(params)
+            // console.log(params)
             API.post('/mechanism/update', params, { Authorization: storage.get('Token') }).then((res) => {
               //console.log(res.data)
               if (res.data.code == 200) {
@@ -507,9 +507,9 @@ export default {
                   message: '编辑成功!'
                 });
               } else if (res.data.code == 1001) {
-                this.signOut()
+                this.signOut();
               } else if (res.data.code == 401) {
-                this.$router.push({ name: 'auth' })
+                this.$router.push({ name: 'auth' });
               } else {
                 this.$message({
                   type: 'error',
@@ -546,9 +546,9 @@ export default {
               message: '删除成功!'
             });
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else if (res.data.code == 401) {
-            this.$router.push({ name: 'auth' })
+            this.$router.push({ name: 'auth' });
           } else {
             this.$message({
               type: 'error',
@@ -561,23 +561,23 @@ export default {
 
     // 翻页器
     handleSizeChange(val) {
-      console.log(this.PageContID)
+      // console.log(this.PageContID)
       //console.log(val);
       this.pageSize = val;
       if(this.PageContID.id == ''||!this.PageContID){
         this.getPage();
       }else {
-        this.getAllTreeList(this.PageContID)
+        this.getAllTreeList(this.PageContID);
       }
     },
     handleCurrentChange(val) {
-      console.log(this.PageContID)
+      // console.log(this.PageContID)
       //console.log(val);
       this.currentPage = val;
       if(this.PageContID.id == '' ||!this.PageContID){
         this.getPage();
       }else {
-        this.getAllTreeList(this.PageContID)
+        this.getAllTreeList(this.PageContID);
       }
     },
 
@@ -599,7 +599,7 @@ export default {
       storage.delete('Auth');
       storage.delete('Token');
       storage.delete('User');
-      this.$router.push({ name: 'login' })
+      this.$router.push({ name: 'login' });
     }
   },
   watch: {

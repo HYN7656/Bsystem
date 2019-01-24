@@ -446,7 +446,7 @@ export default {
               }
             });
           }else {
-            return
+            return;
           }
 
         }else {
@@ -634,9 +634,6 @@ export default {
     /***********************角色分配模块**************************************/
     // 分配
     allotOpen(id, name, jg) {
-      console.log(id)
-      console.log(name)
-      console.log(jg)
       this.assignRolePop = true;
       this.fpName = name;
       this.fpJg = jg;
@@ -773,7 +770,7 @@ export default {
         arr.push(this.arrFP[i].id);
       }
       arr = this.uniq(arr);
-      console.log(arr)
+      // console.log(arr)
       if(!arr.length || !arr) {
         this.$message({
           type: "success",

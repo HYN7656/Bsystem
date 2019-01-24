@@ -88,20 +88,20 @@
           type: 'success',
           message: '修改成功!'
         });
-        let that = this
+        let that = this;
         setTimeout(function () {
           that.settingPop = false;
-        }, 400)
+        }, 400);
       },
       onSubmitPassword() {
         this.$message({
           type: 'success',
           message: '修改成功!'
         });
-        let that = this
+        let that = this;
         setTimeout(function () {
           that.settingPop = false;
-        }, 400)
+        }, 400);
       },
       settingUserClick() {
 

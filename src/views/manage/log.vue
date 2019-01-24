@@ -106,9 +106,9 @@ export default {
           }
           this.tableData = obj;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -135,9 +135,9 @@ export default {
           }
           this.tableData = obj;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -150,7 +150,7 @@ export default {
     handleCurrentChange(val) {
       // console.log(val);
       this.currentPage = val;
-      this.getPage()
+      this.getPage();
     },
     signOut() {
       this.$message({
@@ -161,7 +161,7 @@ export default {
       storage.delete('Auth');
       storage.delete('Token');
       storage.delete('User');
-      this.$router.push({ name: 'login' })
+      this.$router.push({ name: 'login' });
     }
   },
   created() {

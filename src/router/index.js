@@ -1,16 +1,16 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import Login from '@/views/login/index'
-import Index from '@/views/manage/index'
-import Auth from '@/views/manage/auth'
+import Vue from 'vue';
+import Router from 'vue-router';
+import Login from '@/views/login/index';
+import Index from '@/views/manage/index';
+import Auth from '@/views/manage/auth';
 
-import Platform from '@/views/manage/app'
-import PlatformLog from '@/views/manage/log'
-import PlatformMenu from '@/views/manage/menu'
-import PlatformOrg from '@/views/manage/organization'
-import PlatformRole from '@/views/manage/role'
-import PlatformUser from '@/views/manage/user'
-Vue.use(Router)
+import Platform from '@/views/manage/app';
+import PlatformLog from '@/views/manage/log';
+import PlatformMenu from '@/views/manage/menu';
+import PlatformOrg from '@/views/manage/organization';
+import PlatformRole from '@/views/manage/role';
+import PlatformUser from '@/views/manage/user';
+Vue.use(Router);
 
 export default new Router({
   base: "/",
@@ -96,4 +96,4 @@ export default new Router({
 
 
   ]
-})
+});

@@ -206,7 +206,7 @@
 </template>
 
 <script>
-import IconArr from './../../assets/json/icons.json'
+import IconArr from './../../assets/json/icons.json';
 
 export default {
   data() {
@@ -281,9 +281,9 @@ export default {
           var arr3 = res.data.data.treeList;
           this.listMenu = this.getOrg(arr3);
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -303,19 +303,19 @@ export default {
       let params = {};
       params['id'] = id;
       API.get('/menu/findChildList', params, { Authorization: storage.get('Token') }).then((res) => {
-        console.log(res.data)
+        // console.log(res.data);
         if (res.data.code == 200) {
           this.tableData = res.data.data;
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
     handleNodeClick(data) {
       //console.log(data.label);
-      this.getAllTreeList(data.id)
+      this.getAllTreeList(data.id);
     },
     // 新增
     addMenu() {
@@ -342,7 +342,7 @@ export default {
             this.loadingBtn = true;
             let params = {};
             if(!this.addObject.pId){
-              params['pId'] = 0
+              params['pId'] = 0;
             }else {
               params['pId'] = this.addObject.pId;
             }
@@ -352,9 +352,9 @@ export default {
             params['hide'] = this.addObject.hide;
             params['permission'] = this.addObject.permission;
             params['des'] = this.addObject.des;
-            console.log(params)
+            // console.log(params)
             API.post('/menu/addMenuInfo', params, { Authorization: storage.get('Token') }).then((res) => {
-              console.log(res.data)
+              // console.log(res.data)
               if (res.data.code == 200) {
                 this.addPop = false;
                 this.getPage();
@@ -363,9 +363,9 @@ export default {
                   message: '新增成功!'
                 });
               } else if (res.data.code == 1001) {
-                this.signOut()
+                this.signOut();
               } else if (res.data.code == 401) {
-                this.$router.push({ name: 'auth' })
+                this.$router.push({ name: 'auth' });
               } else {
                 this.$message({
                   type: 'error',
@@ -405,15 +405,15 @@ export default {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data.menuInfo;
-          this.editObject.hide = String(res.data.data.menuInfo.hide)
-          this.editObject.pId = res.data.data.menuInfo.pid
-          this.editObject.sId = res.data.data.menuInfo.id
-          this.editObject.branch = res.data.data.pname
+          this.editObject.hide = String(res.data.data.menuInfo.hide);
+          this.editObject.pId = res.data.data.menuInfo.pid;
+          this.editObject.sId = res.data.data.menuInfo.id;
+          this.editObject.branch = res.data.data.pname;
           //console.log(this.editObject)
         } else if (res.data.code == 1001) {
-          this.signOut()
+          this.signOut();
         } else if (res.data.code == 401) {
-          this.$router.push({ name: 'auth' })
+          this.$router.push({ name: 'auth' });
         }
       })
     },
@@ -426,7 +426,7 @@ export default {
             let params = {};
             params['sId'] = this.editObject.sId;
             if(!this.editObject.pId){
-              params['pId'] = 0
+              params['pId'] = 0;
             }else {
               params['pId'] = this.editObject.pId;
             }
@@ -448,9 +448,9 @@ export default {
                   message: '编辑成功!'
                 });
               } else if (res.data.code == 1001) {
-                this.signOut()
+                this.signOut();
               } else if (res.data.code == 401) {
-                this.$router.push({ name: 'auth' })
+                this.$router.push({ name: 'auth' });
               } else {
                 this.$message({
                   type: 'error',
@@ -472,7 +472,7 @@ export default {
     },
     // 打开icon
     chooseIcon() {
-      this.choosePop = true
+      this.choosePop = true;
     },
     // 选择icon
     chooseMenu(item) {
@@ -482,18 +482,18 @@ export default {
     },
     // 打开上级菜单模态框
     isBranchPop() {
-      this.chooseBranchPop = true
+      this.chooseBranchPop = true;
     },
     // 选择上级菜单
     chooseNodeClick(data) {
       //console.log(data)
-      this.middleChooseBranch = data.label
-      this.middleChooseId = data.id
+      this.middleChooseBranch = data.label;
+      this.middleChooseId = data.id;
       this.addObject.pId = this.middleChooseId;
       this.editObject.pId = this.middleChooseId;
       this.addObject.branch = this.middleChooseBranch;
       this.editObject.branch = this.middleChooseBranch;
-      this.chooseBranchPop = false
+      this.chooseBranchPop = false;
     },
     // 保存上级菜单
     /*confirmChooseBranch() {
@@ -525,9 +525,9 @@ export default {
               message: '删除成功!'
             });
           } else if (res.data.code == 1001) {
-            this.signOut()
+            this.signOut();
           } else if (res.data.code == 401) {
-            this.$router.push({ name: 'auth' })
+            this.$router.push({ name: 'auth' });
           } else {
             this.$message({
               type: 'error',
@@ -546,7 +546,7 @@ export default {
       storage.delete('Auth');
       storage.delete('Token');
       storage.delete('User');
-      this.$router.push({ name: 'login' })
+      this.$router.push({ name: 'login' });
     }
   },
   watch: {

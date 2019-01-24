@@ -28,7 +28,7 @@
 
 <script>
 import md5 from 'js-md5';
-import { encrypt } from '@/utils/utils.js'
+import { encrypt } from '@/utils/utils.js';
   export default {
     data() {
       return {
@@ -63,7 +63,7 @@ import { encrypt } from '@/utils/utils.js'
               storage.set('Token', res.data.data.token);
               storage.setJson('User', res.data.data.user);
               storage.setJson('Auth', res.data.data.diction);
-              this.$router.push({name: 'home'})
+              this.$router.push({name: 'home'});
             } else {
               this.$message({
                 type: 'error',
