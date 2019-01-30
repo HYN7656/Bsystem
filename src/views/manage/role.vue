@@ -39,11 +39,11 @@
       </div>
     </div>
     <!--新增-->
-    <el-dialog title="新增" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="新增" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <div class="pop-content">
         <el-form ref="addObject" :model="addObject" label-width="100px" :rules="rules">
           <el-form-item label="归属机构" prop="umechanism">
-            <el-select v-model="addObject.umechanism" placeholder="请选择归属机构">
+            <el-select v-model="addObject.umechanism" placeholder="请选择归属机构" filterable>
               <el-option v-for="item in OrgOpt" :key="item.id" :label="item.mName" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
@@ -74,11 +74,11 @@
       </div>
     </el-dialog>
     <!--修改-->
-    <el-dialog title="修改" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="修改" :visible.sync="editPop" class="tip-dialog" :close-on-click-modal="false">
       <div class="pop-content">
         <el-form ref="editObject" :model="editObject" label-width="100px" :rules="rules">
           <el-form-item label="归属机构">
-            <el-select v-model="mechanismId" placeholder="请选择归属机构">
+            <el-select v-model="mechanismId" placeholder="请选择归属机构" filterable>
               <el-option v-for="item in OrgOpt" :key="item.id" :label="item.mName" :value="item.id"></el-option>
             </el-select>
           </el-form-item>

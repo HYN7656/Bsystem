@@ -3,7 +3,7 @@
     <div class="left cell">
       <div class="title">菜单管理</div>
       <div class="content">
-        <div style="overflow: auto; height: 700px;">
+        <div>
           <el-tree
           :data="listMenu"
           :props="defaultProps"
@@ -44,7 +44,7 @@
       </div>
     </div>
     <!--添加-->
-    <el-dialog title="添加菜单" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加菜单" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <div class="pop-content">
         <el-form ref="addObject" :model="addObject" label-width="100px" :rules="rules">
           <el-form-item label="上级菜单">
@@ -100,7 +100,6 @@
       :visible.sync="editPop"
       class="tip-dialog"
       :close-on-click-modal="false"
-      :show-close="false"
     >
       <div class="pop-content">
         <el-form ref="editObject" :model="editObject" label-width="100px" :rules="rules">
@@ -559,6 +558,18 @@ export default {
   }
 };
 </script>
+<style>
+  .el-dialog__wrapper .el-tree {
+    max-height: 550px;
+    height: 550px;
+    overflow: auto;
+  }
+  .left .el-tree {
+    max-height: 750px;
+    height: 750px;
+    overflow: auto;
+  }
+</style>
 <style lang="less">
 .menu-page {
   .content {

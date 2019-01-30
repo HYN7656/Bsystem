@@ -19,7 +19,7 @@
           <el-row :gutter="20" style="margin-bottom:20px;">
             <el-col :span="8" class="flex">
               <span class="name">归属机构：</span>
-              <el-select v-model="search.org" clearable placeholder="请选择">
+              <el-select filterable v-model="search.org" clearable placeholder="请选择">
                 <el-option
                   v-for="item in OrgOpt"
                   :key="item.id"
@@ -94,17 +94,13 @@
       </div>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <div class="pop-content">
         <el-form ref="addObject" :model="addObject" label-width="100px" status-icon :rules="rules">
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="归属机构">
-                <el-select
-                  v-model="addObject.umechanism"
-                  placeholder="请选择归属机构"
-                  @change="getDepartment(addObject.umechanism)"
-                >
+                <el-select v-model="addObject.umechanism" filterable placeholder="请选择归属机构" @change="getDepartment(addObject.umechanism)">
                   <el-option
                     v-for="item in OrgOpt"
                     :key="item.id"
@@ -206,7 +202,6 @@
       :visible.sync="editPop"
       class="tip-dialog"
       :close-on-click-modal="false"
-      :show-close="false"
     >
       <div class="pop-content">
         <el-form
@@ -219,11 +214,7 @@
           <el-row :gutter="20">
             <el-col :span="12">
               <el-form-item label="归属机构">
-                <el-select
-                  v-model="editObject.umechanism"
-                  placeholder="请选择归属机构"
-                  @change="getDepartment(editObject.umechanism)"
-                >
+                <el-select filterable v-model="editObject.umechanism" placeholder="请选择归属机构" @change="getDepartment(editObject.umechanism)">
                   <el-option
                     v-for="item in OrgOpt"
                     :key="item.id"
@@ -265,11 +256,15 @@
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
-              <el-form-item label="重置密码">
-                <el-input v-model="editObject.ResetPasswd" placeholder="请输入重置密码"></el-input>
+              <el-form-item label="重置密码"  prop="ResetPasswd">
+                <el-input v-model="editObject.ResetPasswd" type="password" placeholder="请输入重置密码"></el-input>
               </el-form-item>
             </el-col>
-            <el-col :span="12"></el-col>
+              <el-col :span="12">
+                <el-form-item label="确认密码" prop="confirmPas1">
+                  <el-input type="password" v-model="editObject.confirmPas1" autocomplete="off" placeholder="请再次输入密码"></el-input>
+                </el-form-item>
+              </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
@@ -293,9 +288,14 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="手机" prop="umobilephone">
-                <el-input v-model="editObject.umobilephone" placeholder="请输入手机号"></el-input>
-              </el-form-item>
+              <div>
+                <div class="phoneBox1">
+                  <span><span style="color: #f56c6c">*</span>手机</span>
+                </div>
+                <div class="phoneBox2">
+                  <el-input v-model="editObject.umobilephone" placeholder="请输入手机号"></el-input>
+                </div>
+              </div>
             </el-col>
           </el-row>
             <div class="userBox">
@@ -365,6 +365,20 @@ export default {
         callback();
       }
     };
+    var validatePass3 = (rule, value, callback) => {
+      if (!!this.editObject.ResetPasswd) {
+        if (!value) {
+          callback(new Error('请再次输入密码'));
+        } else if (value != this.editObject.ResetPasswd) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      } else {
+        callback();
+      }
+
+    };
     return {
       loadingBtn : false,
       editPop: false,
@@ -407,13 +421,13 @@ export default {
         uusername: '',
         uname: '',
         upasswd: '',
-        confirmPas: '',
+        confirmPas1: '',
         uemail: '',
         utelephone: '',
         umobilephone: '',
         urole: [],
         ucontent: '',
-        ResetPasswd: ''
+        ResetPasswd: '',
       },
       tsUserEdit: '0',
       tableData: [],
@@ -433,6 +447,14 @@ export default {
         confirmPas: [
           { validator: validatePass2, trigger: 'blur' },
           { required: true, message: '请再次输入密码', trigger: 'blur' },
+          { min: 6, message: '长度至少6位', trigger: 'blur' }
+        ],
+        ResetPasswd: [
+          { min: 6, message: '长度至少6位', trigger: 'blur' }
+        ],
+        confirmPas1: [
+          { validator: validatePass3, trigger: 'blur' },
+          // { required: true, message: '请再次输入密码', trigger: 'blur' },
           { min: 6, message: '长度至少6位', trigger: 'blur' }
         ],
         uemail: [
@@ -461,7 +483,8 @@ export default {
       listOrgArr: [],
       num : 0,
       UName : '',
-      PageContID : ''
+      PageContID : '',
+      phoneNum:''
 
     };
   },
@@ -756,13 +779,13 @@ export default {
         uusername: '',
         uname: '',
         upasswd: '',
-        confirmPas: '',
+        confirmPas1: '',
         uemail: '',
         utelephone: '',
         umobilephone: '',
         urole: [],
         ucontent: '',
-        ResetPasswd: ''
+        ResetPasswd: '',
       }
       this.tsUserEdit = '';
       this.udepartmentName = '';
@@ -772,9 +795,10 @@ export default {
       let params = {};
       params['id'] = id;
       API.get('/user/findById', params, { Authorization: storage.get('Token') }).then((res) => {
-        //console.log(res.data)
+        // console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data;
+          this.phoneNum = res.data.data.umobilephone;
           this.UName = this.editObject.uname;
           this.tsUserEdit = res.data.data.uspecialUser.toString();
           var obj = res.data.data;
@@ -823,7 +847,6 @@ export default {
           message: '用户角色必选'
         });
       }else {
-
         // 进行表单校验
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -846,9 +869,31 @@ export default {
                 }
                 params['uEmail'] = this.editObject.uemail;
                 params['uTelephone'] = this.editObject.utelephone;
-                params['uMobilephone'] = this.editObject.umobilephone;
+                let phone = '';
+                const reg = /^1[3|4|5|7|8][0-9]\d{8}$/;
+                if(this.editObject.umobilephone == ''){
+                  this.$message({
+                    type: 'error',
+                    message: '手机号必填'
+                  });
+                  this.loadingBtn = false;
+                  this.num = 0;
+                  return;
+                }else if(this.editObject.umobilephone == this.phoneNum) {
+                  phone = '';
+                }else if(!reg.test(this.editObject.umobilephone)){
+                  this.$message({
+                    type: 'error',
+                    message: '请输入正确手机号'
+                  });
+                  this.loadingBtn = false;
+                  this.num = 0;
+                  return;
+                }else {
+                  phone = this.editObject.umobilephone;
+                }
+                params['uMobilephone'] = phone;
                 params['uRole'] = this.editObject.urole;
-
                 params['uContent'] = this.editObject.ucontent;
                 params['uSpecialUser'] = this.tsUserEdit;
                 // console.log(params)
@@ -899,7 +944,30 @@ export default {
                     }
                     params['uEmail'] = this.editObject.uemail;
                     params['uTelephone'] = this.editObject.utelephone;
-                    params['uMobilephone'] = this.editObject.umobilephone;
+                    let phone = '';
+                    const reg = /^1[3|4|5|7|8][0-9]\d{8}$/;
+                    if(this.editObject.umobilephone == ''){
+                      this.$message({
+                        type: 'error',
+                        message: '手机号必填'
+                      });
+                      this.loadingBtn = false;
+                      this.num = 0;
+                      return;
+                    }else if(this.editObject.umobilephone == this.phoneNum) {
+                      phone = '';
+                    }else if(!reg.test(this.editObject.umobilephone)){
+                      this.$message({
+                        type: 'error',
+                        message: '请输入正确手机号'
+                      });
+                      this.loadingBtn = false;
+                      this.num = 0;
+                      return;
+                    }else {
+                      phone = this.editObject.umobilephone;
+                    }
+                    params['uMobilephone'] = phone;
                     params['uRole'] = this.editObject.urole;
 
                     params['uContent'] = this.editObject.ucontent;
@@ -1068,12 +1136,18 @@ export default {
 };
 </script>
 <style>
-  .del-span {
-    position: absolute;
-    right: 12px;
-    top: 9px;
-    color: #c0c4cc;
-    cursor: pointer;
+  .phoneBox1 {
+    float: left;
+    width: 90px;
+    text-align: right;
+    padding-right: 10px;
+  }
+  .phoneBox1 >span {
+    line-height: 35px;
+  }
+  .phoneBox2 {
+    float: left;
+    width: 265.75px;
   }
   .userBox {
     margin: 0 0 15px 27px;
@@ -1091,9 +1165,26 @@ export default {
   margin-left: initial !important;
   text-align: center;
 }
+  .el-dialog__wrapper .el-tree {
+    max-height: 550px;
+    height: 550px;
+    overflow: auto;
+  }
+  .left .el-tree {
+    max-height: 750px;
+    height: 750px;
+    overflow: auto;
+  }
 </style>
 <style lang="less">
 .user-page {
+  .del-span {
+    position: absolute;
+    right: 12px;
+    top: 9px;
+    color: #c0c4cc;
+    cursor: pointer;
+  }
   .content {
     .search-nav {
       .flex {

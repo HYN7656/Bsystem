@@ -49,7 +49,7 @@
       </div>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加机构" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" :show-close="false">
+    <el-dialog title="添加机构" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
       <div class="pop-content">
         <el-form ref="addObject" :model="addObject" label-width="100px" status-icon :rules="rules">
           <el-form-item label="上级机构">
@@ -110,7 +110,6 @@
       :visible.sync="editPop"
       class="tip-dialog"
       :close-on-click-modal="false"
-      :show-close="false"
     >
       <div class="pop-content">
         <el-form
@@ -615,7 +614,20 @@ export default {
   }
 };
 </script>
+<style>
+  .el-dialog__wrapper .el-tree {
+    max-height: 550px;
+    height: 550px;
+    overflow: auto;
+  }
+  .left .el-tree {
+    max-height: 750px;
+    height: 750px;
+    overflow: auto;
+  }
+</style>
 <style lang="less">
+.org-page {
   .del-span {
     position: absolute;
     right: 12px;
@@ -623,7 +635,6 @@ export default {
     color: #c0c4cc;
     cursor: pointer;
   }
-.org-page {
   .content {
     .search-nav {
       .flex {
