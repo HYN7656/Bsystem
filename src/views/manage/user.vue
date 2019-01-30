@@ -374,7 +374,9 @@ export default {
         } else {
           callback();
         }
-      } else {
+      } else if(this.editObject.ResetPasswd != value){
+        callback(new Error('请输入重置密码'));
+      }else {
         callback();
       }
 
