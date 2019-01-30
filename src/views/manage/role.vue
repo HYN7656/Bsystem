@@ -439,7 +439,7 @@ export default {
               } else {
                 this.$message({
                   type: "error",
-                  message: "新增失败!"
+                  message: "新增失败!"+ res.data.message
                 });
                 this.loadingBtn = false;
                 this.num = 0;
@@ -569,7 +569,7 @@ export default {
               } else {
                 this.$message({
                   type: "error",
-                  message: "修改失败!"
+                  message: "修改失败!"+ res.data.message
                 });
                 this.loadingBtn = false;
                 this.num = 0;
@@ -620,12 +620,12 @@ export default {
           } else if (res.data.code == 10013) {
             this.$message({
               type: "error",
-              message: res.data.message
+              message:"删除失败!"+ res.data.message
             });
           } else {
             this.$message({
               type: "error",
-              message: "删除失败!"
+              message: "删除失败!"+ res.data.message
             });
           }
         });
@@ -802,7 +802,7 @@ export default {
           } else {
             this.$message({
               type: "error",
-              message: "分配失败!"
+              message: "分配失败!"+ res.data.message
             });
           }
         });
