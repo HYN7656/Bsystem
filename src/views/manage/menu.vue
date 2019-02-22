@@ -1,7 +1,7 @@
 <template>
   <div class="menu-page">
     <div class="left cell">
-      <div class="title">菜单管理</div>
+      <div class="title">菜单管理<el-button type="success" icon="el-icon-refresh" circle size="mini" style="float: right" @click="getRes"></el-button></div>
       <div class="content">
         <div>
           <el-tree
@@ -84,7 +84,7 @@
             <el-input v-model="addObject.permission" placeholder="请输入权限标识"></el-input>
             <span>控制器中定义的权限标识，如：replyExport</span>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="备注" prop="des">
             <el-input type="textarea" v-model="addObject.des" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item>
@@ -140,7 +140,7 @@
             <el-input v-model="editObject.permission" placeholder="请输入权限标识"></el-input>
             <span>控制器中定义的权限标识，如：replyExport</span>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="备注" prop="des">
             <el-input type="textarea" v-model="editObject.des" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item>
@@ -209,6 +209,15 @@ import IconArr from './../../assets/json/icons.json';
 
 export default {
   data() {
+    var validatePass = (rule, value, callback) => {
+      var reg = /[\u4E00-\u9FA5\uF900-\uFA2D]/;
+      ////console.log(reg.test(value));
+      if (!reg.test(value)) {
+        callback();
+      } else {
+        return callback(new Error('请输入正确链接格式'));
+      }
+    };
     return {
       loadingBtn : false,
       editPop: false,
@@ -258,18 +267,29 @@ export default {
           { min: 1, max: 30, message: '长度在 1 到 20 个字符之间', trigger: 'blur' }
         ],
         url: [
+          { validator: validatePass, trigger: 'blur' },
           { required: true, message: '链接必填' },
-          { min: 1, max: 30, message: '长度在 1 到 150 个字符之间', trigger: 'blur' }
+          { min: 1, max: 50, message: '长度在 1 到 50 个字符之间', trigger: 'blur' }
         ],
         permission: [
+          { validator: validatePass, trigger: 'blur' },
           { required: true, message: '权限标识必填' },
-          { min: 1, max: 30, message: '长度在 1 到 150 个字符之间', trigger: 'blur' }
-        ]
+          { min: 1, max: 50, message: '长度在 1 到 50 个字符之间', trigger: 'blur' }
+        ],
+        des: [
+          { min: 1, max: 150, message: '长度在 1 到 150 个字符之间', trigger: 'blur' }
+        ],
       },
 
     };
   },
   methods: {
+    //刷新
+    getRes(){
+      this.getPage();
+      // this.getAffiliate();
+      // this.getTree();
+    },
     // 页面初始化
     getPage() {
       let params = {};
@@ -559,12 +579,12 @@ export default {
 };
 </script>
 <style>
-  .el-dialog__wrapper .el-tree {
+  .menu-page .el-dialog__wrapper .el-tree {
     max-height: 550px;
     height: 550px;
     overflow: auto;
   }
-  .left .el-tree {
+  .menu-page .left .el-tree {
     max-height: 750px;
     height: 750px;
     overflow: auto;

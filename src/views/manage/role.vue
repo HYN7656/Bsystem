@@ -63,7 +63,7 @@
               ></el-tree>
             </div>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="备注" prop="desc">
             <el-input type="textarea" v-model="addObject.desc" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item>
@@ -98,7 +98,7 @@
               ></el-tree>
             </div>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="备注" prop="desc">
             <el-input type="textarea" v-model="editObject.desc" placeholder="请输入备注"></el-input>
           </el-form-item>
           <el-form-item>
@@ -309,10 +309,13 @@ export default {
       rules: {
         roleName: [
           { required: true, message: '角色名称必填' },
-          { min: 1, max: 30, message: '长度在 1 到 20 个字符之间', trigger: 'blur' }
+          { min: 1, max: 30, message: '长度在 1 到 30 个字符之间', trigger: 'blur' }
         ],
         umechanism : [
           { required: true, message: '归属机构必填' }
+        ],
+        desc: [
+          { min: 1, max: 150, message: '长度在 1 到 150 个字符之间', trigger: 'blur' }
         ],
       },
       num : 0
@@ -1034,7 +1037,9 @@ export default {
   }
   .roleTree {
     overflow: auto;
-    height: 300px;
+    /*height: 300px;*/
+    min-height: 300px;
+    height: 1px;
   }
 }
 </style>

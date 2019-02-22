@@ -1,7 +1,8 @@
 <template>
   <div class="org-page">
     <div class="left cell">
-      <div class="title">组织机构</div>
+      <div class="title">组织机构
+        <el-button type="success" icon="el-icon-refresh" circle size="mini" style="float: right" @click="getRes"></el-button></div>
       <div class="content">
         <el-tree
           :data="listOrg"
@@ -267,6 +268,12 @@ export default {
     };
   },
   methods: {
+    //刷新
+    getRes(){
+      this.getPage();
+      // this.getAffiliate();
+      this.getTree();
+    },
     //加载所有机构和部门
     getTree() {
       let params = {};

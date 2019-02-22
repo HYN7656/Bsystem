@@ -1,8 +1,11 @@
 <template>
   <div class="user-page">
     <div class="left cell">
-      <div class="title">组织机构</div>
+      <div class="title">组织机构
+          <el-button type="success" icon="el-icon-refresh" circle size="mini" style="float: right" @click="getRes"></el-button>
+       </div>
       <div class="content">
+
         <el-tree
           :data="listOrgAll"
           :props="defaultProps"
@@ -56,7 +59,7 @@
               <el-input class="input" placeholder="请输入姓名" v-model="search.Name"></el-input>
             </el-col>
             <el-col :span="2" class="flex">
-              <el-button type="primary" icon="el-icon-search" @click="getSearch">搜索</el-button>
+              <el-button type="primary" icon="el-icon-search" @click="goReset">搜索</el-button>
             </el-col>
             <el-col :span="4" class="flex">
               <el-button type="success" @click="addUser">添加</el-button>
@@ -64,7 +67,7 @@
           </el-row>
         </div>
         <div class="result-table">
-          <el-table :data="tableData" border style="width: 100%">
+          <el-table :data="tableData" border style="width: 100%" v-loading="loading">
             <el-table-column prop="umechanismName" label="归属机构" width="200"></el-table-column>
             <el-table-column prop="udepartmentName" label="归属部门" width="120"></el-table-column>
             <el-table-column prop="uname" label="登录名" width="120"></el-table-column>
@@ -94,7 +97,7 @@
       </div>
     </div>
     <!--添加弹框-->
-    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false">
+    <el-dialog title="添加用户" :visible.sync="addPop" class="tip-dialog" :close-on-click-modal="false" @close="closeDia">
       <div class="pop-content">
         <el-form ref="addObject" :model="addObject" label-width="100px" status-icon :rules="rules">
           <el-row :gutter="20">
@@ -202,6 +205,7 @@
       :visible.sync="editPop"
       class="tip-dialog"
       :close-on-click-modal="false"
+      @close="closeDia"
     >
       <div class="pop-content">
         <el-form
@@ -386,6 +390,7 @@ export default {
       editPop: false,
       addPop: false,
       choosePop: false,
+      loading:false,
       OrgOpt: [],
       power: [],
       checkedRole: [],
@@ -486,11 +491,18 @@ export default {
       num : 0,
       UName : '',
       PageContID : '',
-      phoneNum:''
+      phoneNum:'',
+      searchNum : 0
 
     };
   },
   methods: {
+    //刷新
+    getRes(){
+      this.getPage();
+      this.getAffiliate();
+      this.getTree();
+    },
     //加载所有机构和部门
     getTree() {
       let params = {};
@@ -595,7 +607,7 @@ export default {
       this.udepartmentName = '';
       let params = {};
       params['id'] = id;
-      API.get('/mechanism/findByMid', params, { Authorization: storage.get('Token') }).then((res) => {
+      API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           var arr = res.data.data;
@@ -621,6 +633,7 @@ export default {
     },
     // 页面初始化
     getPage() {
+      this.loading = true;
       let params = {};
       params['page'] = this.currentPage;
       params['count'] = this.pageSize;
@@ -629,6 +642,7 @@ export default {
         if (res.data.code == 200) {
           this.total = res.data.count;
           this.tableData = res.data.data;
+          this.loading = false;
         } else if (res.data.code == 1001) {
           this.signOut();
         } else if (res.data.code == 401) {
@@ -636,19 +650,29 @@ export default {
         }
       })
     },
+    goReset(){
+      this.currentPage = 1;
+      this.pageSize = 10;
+      this.searchNum = 1;
+      this.getSearch();
+    },
     // 搜索
     getSearch() {
+      this.loading = true;
       let params = {};
       params['uMechanism'] = this.search.org;
       params['uDepartment'] = this.udepartmentId;
       params['uName'] = this.search.loginName;
       params['uUsername'] = this.search.Name;
+      params['page'] = this.currentPage;
+      params['count'] = this.pageSize;
       // console.log(params)
       API.get('/user/findByName', params, { Authorization: storage.get('Token') }).then((res) => {
         //console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
           this.tableData = res.data.data;
+          this.loading = false;
         } else if (res.data.code == 1001) {
           this.signOut();
         } else if (res.data.code == 401) {
@@ -664,6 +688,10 @@ export default {
     // 搜索部门取值
     handleNodeClick(data) {
       this.search.branch = data.label;
+    },
+    closeDia(){
+      this.udepartmentName = '';
+      this.udepartmentId = ""
     },
     // 新增
     addUser() {
@@ -1093,20 +1121,33 @@ export default {
       //console.log(val);
       this.pageSize = val;
       if(this.PageContID == ''){
-        this.getPage();
+        // this.getPage();
+        if(this.searchNum == '1'){
+          this.getSearch();
+        }else {
+          this.getPage();
+        }
       }else {
         this.OrgTreeClick(this.PageContID);
       }
+
 
     },
     handleCurrentChange(val) {
       //console.log(val);
       this.currentPage = val;
       if(this.PageContID == ''){
-        this.getPage();
+        if(this.searchNum == '1'){
+          this.getSearch();
+        }else {
+          this.getPage();
+        }
+        // this.getPage();
+
       }else {
         this.OrgTreeClick(this.PageContID);
       }
+
     },
 
     signOut() {

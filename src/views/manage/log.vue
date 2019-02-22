@@ -7,7 +7,15 @@
           <el-row :gutter="20" style="margin-bottom:20px;">
             <el-col :span="8" class="flex">
               <span class="name">操作菜单：</span>
-              <el-input class="input" placeholder="请输入菜单" v-model="search.menu"></el-input>
+              <el-select filterable v-model="search.menu" clearable placeholder="请选择操作菜单" style="width: 100%">
+                <el-option
+                  v-for="item in OrgOpt"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+              <!--<el-input class="input" placeholder="请输入菜单" v-model="search.menu"></el-input>-->
             </el-col>
             <el-col :span="8" class="flex">
               <span class="name">用户ID：</span>
@@ -37,12 +45,12 @@
               </span>
             </el-col>
             <el-col :span="3" class="flex">
-              <el-button type="primary" icon="el-icon-search" @click="searchClick">查询</el-button>
+              <el-button type="primary" icon="el-icon-search" @click="goReset">查询</el-button>
             </el-col>
           </el-row>
         </div>
         <div class="result-table">
-          <el-table :data="tableData" border style="width: 100%" max-height="550">
+          <el-table :data="tableData" border style="width: 100%" max-height="550" v-loading="loading">
             <el-table-column prop="operationMenu" label="操作菜单" width="150"></el-table-column>
             <el-table-column prop="operationUser" label="操作用户" width="120"></el-table-column>
             <el-table-column prop="mechanism" label="所在机构"></el-table-column>
@@ -86,12 +94,23 @@ export default {
         dateEnd: '',
         normal: 0
       },
-      tableData: []
+      tableData: [],
+      loading : false,
+      searchNum:0,
+      OrgOpt:[
+        {id:'查看单条',name:'查看单条'},
+        {id:'查看全部',name:'查看全部'},
+        {id:'根据条件查询',name:'根据条件查询'},
+        {id:'修改',name:'修改'},
+        {id:'添加',name:'添加'},
+        {id:'删除',name:'删除'}
+      ]
     };
   },
   methods: {
     // 页面初始化
     getPage() {
+      this.loading = true;
       let params = {};
       params['page'] = this.currentPage;
       params['count'] = this.pageSize;
@@ -105,6 +124,7 @@ export default {
             obj[i].time = obj[i].createTime.replace('T', ' ');
           }
           this.tableData = obj;
+          this.loading = false;
         } else if (res.data.code == 1001) {
           this.signOut();
         } else if (res.data.code == 401) {
@@ -112,8 +132,16 @@ export default {
         }
       })
     },
+
+    goReset(){
+      this.currentPage = 1;
+      this.pageSize = 10;
+      this.searchNum = 1;
+      this.searchClick();
+    },
     // 搜索
     searchClick() {
+      this.loading = true;
       this.search.dateStart = this.date[0];
       this.search.dateEnd = this.date[1];
       let params = {};
@@ -123,6 +151,8 @@ export default {
       params['startTime'] = this.search.dateStart;
       params['endTime'] = this.search.dateEnd;
       params['abnormal'] = this.search.normal;
+      params['page'] = this.currentPage;
+      params['count'] = this.pageSize;
       // console.log(params)
 
       API.get('/journal/findByCondition', params, { Authorization: storage.get('Token') }).then((res) => {
@@ -134,6 +164,7 @@ export default {
             obj[i].time = obj[i].createTime.replace('T', ' ');
           }
           this.tableData = obj;
+          this.loading = false;
         } else if (res.data.code == 1001) {
           this.signOut();
         } else if (res.data.code == 401) {
@@ -143,14 +174,20 @@ export default {
     },
     // 翻页器
     handleSizeChange(val) {
-      // console.log(val);
       this.pageSize = val;
-      this.getPage();
+      if(this.searchNum == '1'){
+        this.searchClick();
+      }else {
+        this.getPage();
+      }
     },
     handleCurrentChange(val) {
-      // console.log(val);
       this.currentPage = val;
-      this.getPage();
+      if(this.searchNum == '1'){
+        this.searchClick();
+      }else {
+        this.getPage();
+      }
     },
     signOut() {
       this.$message({
