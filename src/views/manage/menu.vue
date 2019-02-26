@@ -264,7 +264,7 @@ export default {
       rules: {
         name: [
           { required: true, message: '名称必填' },
-          { min: 1, max: 30, message: '长度在 1 到 20 个字符之间', trigger: 'blur' }
+          { min: 1, max: 20, message: '长度在 1 到 20 个字符之间', trigger: 'blur' }
         ],
         url: [
           { validator: validatePass, trigger: 'blur' },
