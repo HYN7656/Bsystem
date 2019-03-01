@@ -22,7 +22,7 @@
           <el-row :gutter="20" style="margin-bottom:20px;">
             <el-col :span="8" class="flex">
               <span class="name">归属机构：</span>
-              <el-select filterable v-model="search.org" clearable placeholder="请选择">
+              <el-select filterable v-model="search.org" clearable placeholder="请选择" @change="getDepartment(search.org)">
                 <el-option
                   v-for="item in OrgOpt"
                   :key="item.id"
@@ -502,6 +502,15 @@ export default {
       this.getPage();
       this.getAffiliate();
       this.getTree();
+      this.searchNum = 0;
+      this.PageContID = ''
+      this.currentPage = 1;
+      this.pageSize = 10;
+      this.search.org = '';
+      this.udepartmentId = '';
+      this.udepartmentName = '';
+      this.search.loginName = '';
+      this.search.Name = '';
     },
     //加载所有机构和部门
     getTree() {
@@ -511,7 +520,7 @@ export default {
         if (res.data.code == 200) {
           var arr = res.data.data;
           this.listOrgAll = this.getOrg(arr);
-          this.listOrg = this.getOrg(arr);
+          // this.listOrg = this.getOrg(arr);
           //console.log(this.listOrgAll)
           var arr = [];
           for (var i = 0; i < this.listOrgAll.length; i++) {
@@ -530,6 +539,12 @@ export default {
     getPageCount(data){
       this.pageSize = 10;
       this.currentPage = 1;
+      this.searchNum = 0;
+      this.search.org = '';
+      this.udepartmentId = '';
+      this.udepartmentName = '';
+      this.search.loginName = '';
+      this.search.Name = '';
       this.OrgTreeClick(data);
     },
     // 左侧树刷新列表
@@ -605,6 +620,7 @@ export default {
     getDepartment(id) {
       // console.log(id)
       this.udepartmentName = '';
+      this.udepartmentId = '';
       let params = {};
       params['id'] = id;
       API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
@@ -658,6 +674,7 @@ export default {
     },
     // 搜索
     getSearch() {
+      // this.this.PageContID = '';
       this.loading = true;
       let params = {};
       params['uMechanism'] = this.search.org;
@@ -926,7 +943,7 @@ export default {
                 params['uRole'] = this.editObject.urole;
                 params['uContent'] = this.editObject.ucontent;
                 params['uSpecialUser'] = this.tsUserEdit;
-                // console.log(params)
+                console.log(params)
                 API.post('/user/update', params, { Authorization: storage.get('Token') }).then((res) => {
                   //console.log(res.data)
                   if (res.data.code == 200) {
@@ -1120,32 +1137,35 @@ export default {
     handleSizeChange(val) {
       //console.log(val);
       this.pageSize = val;
-      if(this.PageContID == ''){
-        // this.getPage();
-        if(this.searchNum == '1'){
-          this.getSearch();
-        }else {
-          this.getPage();
-        }
-      }else {
+      if(this.PageContID == ''&&this.searchNum ==0){
+        this.getPage();
+        // alert('啥也没点')
+      }else if(this.PageContID == ''&&this.searchNum ==1){
+        this.getSearch();
+        // alert('点击了搜索')
+      }else if(this.PageContID != ""&&this.searchNum ==0){
         this.OrgTreeClick(this.PageContID);
+        // alert("点击了左侧")
+      }else if(this.PageContID != ""&&this.searchNum ==1){
+        this.getSearch();
+        // alert('点击了左侧同时点击了搜索')
       }
-
-
     },
     handleCurrentChange(val) {
       //console.log(val);
       this.currentPage = val;
-      if(this.PageContID == ''){
-        if(this.searchNum == '1'){
-          this.getSearch();
-        }else {
-          this.getPage();
-        }
-        // this.getPage();
-
-      }else {
+      if(this.PageContID == ''&&this.searchNum ==0){
+        this.getPage();
+        // alert('啥也没点')
+      }else if(this.PageContID == ''&&this.searchNum ==1){
+        this.getSearch();
+        // alert('点击了搜索')
+      }else if(this.PageContID != ""&&this.searchNum ==0){
         this.OrgTreeClick(this.PageContID);
+        // alert("点击了左侧")
+      }else if(this.PageContID != ""&&this.searchNum ==1){
+        this.getSearch();
+        // alert('点击了左侧同时点击了搜索')
       }
 
     },

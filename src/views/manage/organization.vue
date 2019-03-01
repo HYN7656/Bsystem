@@ -120,7 +120,7 @@
           status-icon
           :rules="rules"
         >
-          <el-form-item label="上级机构">
+          <el-form-item label="上级机构" v-show="sjjg">
             <div class="el-select" readonly="readonly">
               <div class="el-input el-input--suffix">
                 <input
@@ -200,6 +200,7 @@
 export default {
   data() {
     return {
+      sjjg:false,
       loadingBtn : false,
       filterText: '',
       editPop: false,
@@ -273,6 +274,7 @@ export default {
       this.getPage();
       // this.getAffiliate();
       this.getTree();
+      this.PageContID = '';
     },
     //加载所有机构和部门
     getTree() {
@@ -462,6 +464,11 @@ export default {
       API.get('/mechanism/findOneById', params, { Authorization: storage.get('Token') }).then((res) => {
         // console.log(res.data)
         if (res.data.code == 200) {
+          if(res.data.message == '10080'){
+            this.sjjg = false;
+          }else {
+            this.sjjg = true;
+          }
           this.editObject = res.data.data[0];
           // console.log(this.editObject)
           var obj = res.data.data[0];
