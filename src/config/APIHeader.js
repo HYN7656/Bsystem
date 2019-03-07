@@ -52,19 +52,19 @@ class API {
     return axios.get(uri, config);
   }
 
-  static delete(uri, params) {
+  /*static delete(uri, params) {
     config.params = {};
     config.params = API.sigParams(uri, params);
     config.url = uri;
     return axios.delete(uri, config);
-  }
+  }*/
 
   /**
    * post请求   有请求头，并且是json的情况下自己序列化参数
    * @param {string} uri 请求地址
    * @param {Object} params 参数
    * @param {Objec} headers  请求头
-   */ 
+   */
   static post(uri, params, headers) {
     config.params = {};
     var data = qs.stringify(params);

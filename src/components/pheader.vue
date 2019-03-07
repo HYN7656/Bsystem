@@ -222,18 +222,29 @@
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          storage.delete('Authorization');
-          storage.delete('auth');
-          storage.delete('token');
-          storage.delete('user');
-          this.$message({
-            type: 'success',
-            message: '您已成功退出!'
-          });
-          let that = this
-          setTimeout(function () {
-            that.$router.push({name: 'login'})
-          }, 300)
+          let params = {};
+          API.post('/user/signout', params).then((res) => {
+            //console.log(res.data)
+            if (res.data.code == 200) {
+              storage.delete('Authorization');
+              storage.delete('auth');
+              storage.delete('token');
+              storage.delete('user');
+              this.$message({
+                type: 'success',
+                message: '您已成功退出!'
+              });
+              let that = this
+              setTimeout(function () {
+                that.$router.push({name: 'login'})
+              }, 300)
+            } else {
+              this.$message({
+                type: 'error',
+                message: res.data.message
+              });
+            }
+          })
         }).catch(() => {
           this.$message({
             type: 'info',

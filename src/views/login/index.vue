@@ -51,7 +51,7 @@ import { encrypt } from '@/utils/utils.js';
           params['uName'] = this.userNum;
           params['uPasswd'] = encrypt(this.userPassword);
           // params['uPasswd'] = this.userPassword;
-          // console.log(params)
+          console.log(params)
           API.post('/user/login', params).then((res) => {
             //console.log(res.data)
             if (res.data.code == 200) {
