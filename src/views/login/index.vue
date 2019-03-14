@@ -23,7 +23,39 @@
         </div>
       </div>
     </div>
+    <el-dialog
+      :visible.sync="PhoneDia"
+      width="25%"
+      title="提示"
+      :show-close="false"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <el-form label-width="70px" class="PhoneForm">
+        <p>登录需要手机验证</p>
+        <p>您的手机是{{phoneNum}}，请输入验证码</p>
+        <div class="PhoneForm-box">
+          <el-col :span="16">
+            <span>验证码：</span>
+            <input type="text" v-model="FirstCode">
+          </el-col>
+          <el-col :span="8">
+            <el-button
+              size="medium"
+              v-bind:disabled="codePhon"
+              @click="Countdown"
+            >获取验证码{{auth_time}}</el-button>
+          </el-col>
+        </div>
+      </el-form>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="PhoneDia = false">取 消</el-button>
+        <el-button type="primary" @click="verCode">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
+
 </template>
 
 <script>
@@ -35,6 +67,12 @@ import { encrypt } from '@/utils/utils.js';
         show: true,
         userNum: '',
         userPassword: '',
+        PhoneDia: false,
+        phoneNum:'',
+        codePhon: false,
+        auth_time: "",
+        FirstCode: "",
+        IdNum:''
       }
     },
     methods: {
@@ -53,7 +91,7 @@ import { encrypt } from '@/utils/utils.js';
           // params['uPasswd'] = this.userPassword;
           console.log(params)
           API.post('/user/login', params).then((res) => {
-            //console.log(res.data)
+            console.log(res.data)
             if (res.data.code == 200) {
               this.$message({
                 type: 'success',
@@ -64,7 +102,16 @@ import { encrypt } from '@/utils/utils.js';
               storage.setJson('User', res.data.data.user);
               storage.setJson('Auth', res.data.data.diction);
               this.$router.push({name: 'home'});
-            } else {
+            } else if(res.data.code == 10014) {
+              this.$message({
+                type: 'warning',
+                message: res.data.message
+              });
+              this.FirstCode = '';
+              this.PhoneDia = true;
+              this.phoneNum = res.data.data.uMobilephone;
+              this.IdNum = res.data.data.id;
+            }else{
               this.$message({
                 type: 'error',
                 message: res.data.message
@@ -73,12 +120,88 @@ import { encrypt } from '@/utils/utils.js';
           })
         }
       },
+      // 获取验证码、倒计时
+      Countdown() {
+        this.codePhon = true;
+        this.auth_time = 60;
+        var auth_timetimer = setInterval(() => {
+          this.auth_time--;
+          if (this.auth_time <= 0) {
+            this.auth_time = "";
+            this.codePhon = false;
+            clearInterval(auth_timetimer);
+          }
+        }, 1000);
+
+        let params = {};
+        // 验证码
+        params["userId"] = this.IdNum;
+        params["type"] = 2;
+        console.log(params)
+        API.get("/code/userVerificationCode", params).then(res => {
+          console.log(res.data)
+          if (res.data.code == 200) {
+            this.$message({
+              type: "success",
+              message: "验证码发送成功!"
+            });
+          }else {
+            this.$message({
+              type: "error",
+              message: res.data.message
+            });
+          }
+        });
+      },
+      // 校验验证码
+      verCode() {
+        //console.log(this.FirstCode)
+        this.PhoneDia = false;
+        let params = {};
+        params["code"] = this.FirstCode;
+        params['uName'] = this.userNum;
+        params['uPasswd'] = encrypt(this.userPassword);
+        console.log(params)
+        API.post("/user/login", params).then(res => {
+          console.log(res.data)
+          if (res.data.code == 200) {
+            //登录成功后 执行跳转，把数据传过去
+            this.$message({
+              type: "success",
+              message: "登录成功！"
+            });
+            storage.set('Token', res.data.data.token);
+            storage.setJson('User', res.data.data.user);
+            storage.setJson('Auth', res.data.data.diction);
+            this.$router.push({name: 'home'});
+          }else {
+            this.$message({
+              type: "error",
+              message: res.data.message
+            });
+          }
+        });
+      },
     },
     created() {
 
     }
   }
 </script>
+<style>
+  .login-box .el-dialog__title {
+    font-size: 18px;
+  }
+  .login-box .el-dialog__footer {
+    padding: 30px 20px 20px;
+  }
+  .login-box .pf2 .el-dialog__body {
+    padding: 10px 20px 0px;
+  }
+  .login-box .pf2 .el-dialog__footer {
+    padding: 20px 20px 20px;
+  }
+</style>
 
 <style lang="less" scoped>
   .login-box {
@@ -191,6 +314,37 @@ import { encrypt } from '@/utils/utils.js';
           letter-spacing: 1px;
           font-size: 18px;
         }
+      }
+    }
+    .PhoneForm {
+      text-align: left;
+      p {
+        line-height: 30px;
+      }
+      .PhoneForm-box {
+        margin: 5px 0;
+      }
+      .pb2 {
+        overflow: hidden;
+      }
+
+      input {
+        -webkit-appearance: none;
+        background-color: #fff;
+        background-image: none;
+        border-radius: 4px;
+        border: 1px solid #dcdfe6;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        color: #606266;
+        display: inline-block;
+        font-size: inherit;
+        height: 35px;
+        line-height: 35px;
+        outline: 0;
+        padding: 0 15px;
+        -webkit-transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
       }
     }
   }

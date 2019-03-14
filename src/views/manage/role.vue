@@ -504,7 +504,7 @@ export default {
       API.get("/role/findRoleById", params, {
         Authorization: storage.get("Token")
       }).then(res => {
-        // console.log(res.data)
+        console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data.roleInfo;
           this.mechanismId = res.data.data.roleInfo.mechanismId;
@@ -553,7 +553,7 @@ export default {
               params["menus"] = '';
             }
             params["desc"] = this.editObject.desc;
-            // console.log(params)
+            console.log(params)
             API.post("/role/updateRole", params, {
               Authorization: storage.get("Token")
             }).then(res => {
