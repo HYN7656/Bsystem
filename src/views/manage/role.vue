@@ -318,7 +318,9 @@ export default {
           { min: 1, max: 150, message: '长度在 1 到 150 个字符之间', trigger: 'blur' }
         ],
       },
-      num : 0
+      num : 0,
+      keyId:'',
+      keyNum:0
     };
   },
   methods: {
@@ -478,6 +480,7 @@ export default {
      * {checkedNodes、checkedKeys、halfCheckedNodes、halfCheckedKeys 四个属性}
      */
     EditCheck(node, selected) {
+      this.keyNum = 1;
       this.menus2 = selected.checkedKeys;
       this.halfCheckedKeys = selected.halfCheckedKeys;
       // console.log("当复选框被点击的时候触发，节点所对应的对象", node);
@@ -489,6 +492,7 @@ export default {
       this.loadingBtn = false;
       this.num = 0;
       this.halfCheckedKeys = [];
+      this.keyNum = 0;
       this.editObject = {
         roleName: "",
         desc: ""
@@ -504,10 +508,11 @@ export default {
       API.get("/role/findRoleById", params, {
         Authorization: storage.get("Token")
       }).then(res => {
-        // console.log(res.data)
+        console.log(res.data)
         if (res.data.code == 200) {
           this.editObject = res.data.data.roleInfo;
           this.mechanismId = res.data.data.roleInfo.mechanismId;
+          this.keyId = res.data.data.menuInfo;
           // 角色权限返显
           var keyList = res.data.data.menuInfo;
           if (keyList) {
@@ -546,14 +551,18 @@ export default {
             params["id"] = this.editObject.id;
             params["mechanismId"] = this.mechanismId;
             params["roleName"] = this.editObject.roleName;
-            if (this.menus2) {
-              this.menus2 = this.menus2.concat(this.halfCheckedKeys);
-              params["menus"] = this.menus2.join(",");
-            } else {
-              params["menus"] = '';
+            if(this.keyNum == 1){
+              if (this.menus2) {
+                this.menus2 = this.menus2.concat(this.halfCheckedKeys);
+                params["menus"] = this.menus2.join(",");
+              } else {
+                params["menus"] = '';
+              }
+            }else if(this.keyNum == 0){
+              params["menus"] = this.keyId;
             }
             params["desc"] = this.editObject.desc;
-            // console.log(params)
+            console.log(params)
             API.post("/role/updateRole", params, {
               Authorization: storage.get("Token")
             }).then(res => {
