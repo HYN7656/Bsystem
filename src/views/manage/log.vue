@@ -131,13 +131,13 @@ export default {
       params['page'] = this.currentPage;
       params['count'] = this.pageSize;
       API.get('/journal/findAll', params, { Authorization: storage.get('Token') }).then((res) => {
-        // console.log(res.data)
+        console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
           var obj = res.data.data;
           for (var i = 0; i < obj.length; i++) {
-            // console.log(obj[i].createTime)
-            obj[i].time = obj[i].createTime.replace('T', ' ');
+            console.log(obj[i].createTime)
+            obj[i].time = obj[i].createTime.slice(0,19);
           }
           this.tableData = obj;
           this.loading = false;
