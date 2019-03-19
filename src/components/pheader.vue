@@ -7,8 +7,8 @@
           <span class="title">空域中心业务系统用户管理</span>
         </span>
         <span class="welcome">
-            <i class="iconfont icon-yonghu"></i><strong>{{userName}}</strong>
-            <!--<i class="icon iconfont icon-shenqing"></i><strong @click="settingClick">设置</strong>-->
+            <i class="iconfont icon-yonghu"></i><strong>欢迎您：{{userName}}</strong>
+            <i class="icon iconfont icon-shenqing"></i><strong @click="OpenPassword">修改密码</strong>
             <i class="iconfont icon-tuichu-copy"></i><strong @click="quit">退出</strong>
         </span>
       </div>
@@ -72,7 +72,7 @@
         <slot name="right-view"></slot>
       </div>
     </div>
-    <el-dialog
+    <!--<el-dialog
       title="手机验证"
       :visible.sync="PhoneDia"
       width="25%"
@@ -87,9 +87,7 @@
 
         <el-form-item label="验证码:">
           <el-col :span="16"><el-input v-model="form.name"></el-input></el-col>
-          <el-col :span="8"><el-button v-bind:disabled="code" @click="Countdown">获取验证码{{auth_time}}</el-button></el-col>
-
-
+          <el-col :span="8"><el-button v-bind:disabled="code">获取验证码{{auth_time}}</el-button></el-col>
         </el-form-item>
       </el-form>
 
@@ -97,16 +95,59 @@
     <el-button @click="dialogVisible = false">取 消</el-button>
     <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
   </span>
+    </el-dialog>-->
+    <el-dialog
+      title="修改密码"
+      :visible.sync="editPassword"
+      width="20%"
+      class="tip-dialog pass-top">
+      <div class="content">
+        <el-form :model="ruleForm2" status-icon :rules="rules2" ref="ruleForm2" label-width="80px"
+                 class="demo-ruleForm">
+          <el-form-item label="原始密码" prop="passOld">
+            <el-input type="password" v-model="ruleForm2.passOld" autocomplete="off"  placeholder="请输入原始密码"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="pass" >
+            <el-input type="password" v-model="ruleForm2.pass" autocomplete="off" placeholder="请输入6-18位数字或字母" ></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="checkPass" >
+            <el-input type="password" v-model="ruleForm2.checkPass" autocomplete="off" placeholder="请再次输入密码"></el-input>
+          </el-form-item>
+        </el-form>
+      </div>
+      <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="submitForm('ruleForm2')" class="confirm">提交</el-button>
+          <el-button @click="resetForm('ruleForm2')" class="cancel">重置</el-button>
+        </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
+  import md5 from 'js-md5';
   export default {
     name: 'PHeader',
     data() {
+      var validatePass = (rule, value, callback) => {
+        const reg = /^[0-9a-zA-Z]*$/g;
+        if (value === '') {
+          callback(new Error('请输入密码'));
+        } else if(reg.test(value)){
+          callback();
+        } else {
+          return callback(new Error('密码只能为字母和数字'));
+        }
+      };
+      var validatePass2 = (rule, value, callback) => {
+        if (value === '') {
+          callback(new Error('请再次输入密码'));
+        } else if (value !== this.ruleForm2.pass) {
+          callback(new Error('两次输入密码不一致!'));
+        } else {
+          callback();
+        }
+      };
       return {
-        edit:false,
         code:false,
         auth_time:'',
         PhoneDia:false,
@@ -115,60 +156,82 @@
         menuS: false,
         roleS: false,
         logS: false,
-        isActive: 1,
-        isLeftNav: 1,
         offHeight: 0,
-        settingPop: false,
-        choosePop: false,
-        activeName: 'first',
         userName: storage.getJson('User').uName,
-        form: {
-          branch: '',
-          num: '',
-          org: '',
-          name: '',
-          loginName: '',
-          password: '',
-          confirmPas: '',
-          mail: '',
-          tel: '',
-          phone: '',
-          isLogin: '',
-          role: '',
-          desc: ''
+        editPassword: false,
+        ruleForm2: {
+          passOld: '',
+          pass: '',
+          checkPass: ''
         },
-        data: [{
-          label: '中国民用航空局空中交通管理局',
-          children: [{
-            label: '空域管理中心',
-            children: [{
-              label: '空域管理室'
-            },
-              {
-                label: '程序设计室'
-              }]
-          }]
-        }],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
+        rules2: {
+          passOld: [
+            {required: true, message: '请输入旧密码', trigger: 'blur'},
+          ],
+          pass: [
+            {validator: validatePass, trigger: 'blur'},
+            // {required: true, message: '请输入新密码', trigger: 'blur'},
+            {min: 6, max: 18, message: '长度在 6 到 18 个字符', trigger: 'blur'}
+
+          ],
+          checkPass: [
+            {validator: validatePass2, trigger: 'blur'},
+            {required: true, message: '请再次输入密码', trigger: 'blur'},
+          ]
         },
-        filterText: '',
       }
     },
     methods: {
-      Countdown(){
-        this.code = true;
-        this.auth_time = 60;
-        var auth_timetimer =  setInterval(()=>{
-          this.auth_time--;
-          if(this.auth_time<=0){
-            this.auth_time = '';
-            this.code = false;
-            clearInterval(auth_timetimer);
-          }
-        }, 1000);
+      OpenPassword() {
+        this.editPassword = true
+        if (this.$refs.ruleForm2) {
+          this.$refs.ruleForm2.clearValidate();
+        }
       },
+      // 修改密码提交
+      submitForm(formName) {
+        this.$refs[formName].validate((valid) => {
+          console.log(this.ruleForm2)
+          if (valid) {
+            let params = {};
+            this.user = storage.getJson('User');
+            console.log(this.user)
+            params['id'] = this.user.id;
+            params['passwd'] =  md5(this.user.uName + this.ruleForm2.passOld);
+            params['newPasswd'] =  md5(this.user.uName + this.ruleForm2.pass);
+            console.log(params)
+            API.post('/user/updatePwds', params, {Authorization: storage.get('Token')}).then((res) => {
+              console.log(res.data)
+              if (res.data.code == 200) {
+                this.editPassword = false;
+                this.$message({
+                  type: 'success',
+                  message: '密码修改成功!需重新登录生效'
+                });
+                storage.delete('Auth');
+                storage.delete('Token');
+                storage.delete('User');
+                this.$router.push({name: 'login'})
+              } else if (res.data.code == 1001) {
+                this.signOut()
+              } else {
+                this.$message({
+                  type: 'error',
+                  message: '密码修改失败!'+ res.data.message
+                });
+              }
+            })
+          } else {
+            console.log('error submit!!');
+            return false;
+          }
+        });
+      },
+      // 重置
+      resetForm(formName) {
+        this.$refs[formName].resetFields();
+      },
+
       getAuto() {
         this.auth = storage.getJson('Auth')
         // console.log(this.auth)
@@ -186,54 +249,34 @@
           }
         }
       },
-      settingClick() {
-        this.settingPop = true
-      },
-      settingUserClick() {
-
-      },
-      onSubmitInfo() {
-        this.$message({
-          type: 'success',
-          message: '修改成功!'
-        });
-        let that = this
-        setTimeout(function () {
-          that.settingPop = false;
-        }, 400)
-      },
-      // 选择部门pop
-      chooseBranchPop() {
-        this.choosePop = true
-      },
-      onSubmitPassword() {
-        this.$message({
-          type: 'success',
-          message: '修改成功!'
-        });
-        let that = this
-        setTimeout(function () {
-          that.settingPop = false;
-        }, 400)
-      },
       quit() {
         this.$confirm('您确定要退出管理平台?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          storage.delete('Authorization');
-          storage.delete('auth');
-          storage.delete('token');
-          storage.delete('user');
-          this.$message({
-            type: 'success',
-            message: '您已成功退出!'
-          });
-          let that = this
-          setTimeout(function () {
-            that.$router.push({name: 'login'})
-          }, 300)
+          let params = {};
+          API.post('/user/signout', params).then((res) => {
+            //console.log(res.data)
+            if (res.data.code == 200) {
+              storage.delete('Auth');
+              storage.delete('Token');
+              storage.delete('User');
+              this.$message({
+                type: 'success',
+                message: '您已成功退出!'
+              });
+              let that = this;
+              setTimeout(function () {
+                that.$router.push({name: 'login'})
+              }, 300)
+            } else {
+              this.$message({
+                type: 'error',
+                message: res.data.message
+              });
+            }
+          })
         }).catch(() => {
           this.$message({
             type: 'info',
@@ -246,10 +289,9 @@
           type: 'error',
           message: '登录失效，请重新登录!'
         });
-        storage.delete('Authorization');
-        storage.delete('auth');
-        storage.delete('token');
-        storage.delete('user');
+        storage.delete('Auth');
+        storage.delete('Token');
+        storage.delete('User');
         this.$router.push({name: 'login'})
       }
     },

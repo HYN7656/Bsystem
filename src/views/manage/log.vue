@@ -18,8 +18,8 @@
               <!--<el-input class="input" placeholder="请输入菜单" v-model="search.menu"></el-input>-->
             </el-col>
             <el-col :span="8" class="flex">
-              <span class="name">用户ID：</span>
-              <el-input class="input" placeholder="请输入ID" v-model="search.id"></el-input>
+              <span class="name">登录名：</span>
+              <el-input class="input" placeholder="请输入登录名" v-model="search.name"></el-input>
             </el-col>
             <el-col :span="8" class="flex">
               <span class="name">URL：</span>
@@ -46,11 +46,22 @@
             </el-col>
             <el-col :span="3" class="flex">
               <el-button type="primary" icon="el-icon-search" @click="goReset">查询</el-button>
+              <el-button type="primary" icon="el-icon-delete" @click="selectDel">删除</el-button>
             </el-col>
           </el-row>
         </div>
         <div class="result-table">
-          <el-table :data="tableData" border style="width: 100%" max-height="550" v-loading="loading">
+          <el-table :data="tableData" border style="width: 100%" max-height="550" v-loading="loading" @selection-change="handleSelectionChange">
+            <el-table-column
+              type="selection"
+              width="55">
+            </el-table-column>
+            <el-table-column
+              type="index"
+              label="序号"
+              width="55"
+              class="column">
+            </el-table-column>
             <el-table-column prop="operationMenu" label="操作菜单" width="150"></el-table-column>
             <el-table-column prop="operationUser" label="操作用户" width="120"></el-table-column>
             <el-table-column prop="mechanism" label="所在机构"></el-table-column>
@@ -59,6 +70,11 @@
             <el-table-column prop="submissionMode" label="提交方式" width="120"></el-table-column>
             <el-table-column prop="operationIp" label="操作者IP" width="120"></el-table-column>
             <el-table-column prop="time" label="操作时间" width="120"></el-table-column>
+            <el-table-column label="操作" width="50">
+              <template slot-scope="scope">
+                <el-button @click="del(scope.row.id)" type="text" size="small">删除</el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
         <div class="pagination-box">
@@ -88,7 +104,7 @@ export default {
       total: 0,
       search: {
         menu: '',
-        id: '',
+        name: '',
         url: '',
         dateStart: '',
         dateEnd: '',
@@ -115,13 +131,13 @@ export default {
       params['page'] = this.currentPage;
       params['count'] = this.pageSize;
       API.get('/journal/findAll', params, { Authorization: storage.get('Token') }).then((res) => {
-        // console.log(res.data)
+        console.log(res.data)
         if (res.data.code == 200) {
           this.total = res.data.count;
           var obj = res.data.data;
           for (var i = 0; i < obj.length; i++) {
-            // console.log(obj[i].createTime)
-            obj[i].time = obj[i].createTime.replace('T', ' ');
+            console.log(obj[i].createTime)
+            obj[i].time = obj[i].createTime.slice(0,19);
           }
           this.tableData = obj;
           this.loading = false;
@@ -142,11 +158,16 @@ export default {
     // 搜索
     searchClick() {
       this.loading = true;
-      this.search.dateStart = this.date[0];
-      this.search.dateEnd = this.date[1];
+      if(!this.date){
+        this.search.dateStart = null;
+        this.search.dateEnd = null;
+      }else {
+        this.search.dateStart = this.date[0];
+        this.search.dateEnd = this.date[1];
+      }
       let params = {};
       params['operationMenu'] = this.search.menu;
-      params['operationUser'] = this.search.id;
+      params['operationUser'] = this.search.name;
       params['operationUri'] = this.search.url;
       params['startTime'] = this.search.dateStart;
       params['endTime'] = this.search.dateEnd;
@@ -170,6 +191,80 @@ export default {
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
         }
+      })
+    },
+    // 选择
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    // 选择删除
+    selectDel() {
+      this.activeTableDataId = [];
+      if (this.multipleSelection.length == 0) {
+        this.$message({
+          type: 'info',
+          message: '请选择需要删除的数据'
+        });
+        return;
+      }
+      this.multipleSelection.forEach(ele => {
+        this.activeTableDataId.push(ele.id);
+      })
+      this.activeTableDataId2 = this.activeTableDataId.join(',');
+      this.$confirm('您确定要删除这' + this.multipleSelection.length + '条数据吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let params = {};
+        params['id'] = this.activeTableDataId2;
+        // params['fSystemId'] = storage.get('sysid');
+        API.post('/journal/delete', params,{Authorization:storage.get('Token')}).then((res) => {
+          // console.log(res.data);
+          if (res.data.code == 200) {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+            this.getPage();
+          } else if(res.data.code == 1001){
+            this.signOut();
+          } else {
+            this.$message({
+              type: 'error',
+              message: '删除失败!'
+            });
+          }
+        });
+      });
+    },
+    // 删除
+    del(id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let params = {};
+        params['id'] = id;
+        API.post('/journal/delete', params, { Authorization: storage.get('Token') }).then((res) => {
+          if (res.data.code == 200) {
+            this.getPage();
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+          } else if (res.data.code == 1001) {
+            this.signOut();
+          } else if (res.data.code == 401) {
+            this.$router.push({ name: 'auth' });
+          } else {
+            this.$message({
+              type: 'error',
+              message: '删除失败!' + res.data.message
+            });
+          }
+        })
       })
     },
     // 翻页器
@@ -206,6 +301,12 @@ export default {
   }
 };
 </script>
+<style>
+
+  .log-page .el-table__row .cell:nth-of-type(1){
+    text-align: center;
+  }
+</style>
 <style lang="less">
 .log-page {
   .content {

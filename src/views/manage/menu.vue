@@ -69,7 +69,7 @@
             <el-input v-model="addObject.url" placeholder="请输入链接"></el-input>
             <span>点击菜单跳转的页面，如/quarterly/handle/replyExport</span>
           </el-form-item>
-          <el-form-item label="图标">
+          <!--<el-form-item label="图标">
             <i class="fa" :class="addObject.icon">{{addObject.icon}}</i>
             <el-button type="primary" @click="chooseIcon" size="small">选择</el-button>
           </el-form-item>
@@ -79,7 +79,7 @@
               <el-radio label="1">隐藏</el-radio>
             </el-radio-group>
             <span>该菜单或操作是否显示到系统菜单中</span>
-          </el-form-item>
+          </el-form-item>-->
           <el-form-item label="权限标识" prop="permission">
             <el-input v-model="addObject.permission" placeholder="请输入权限标识"></el-input>
             <span>控制器中定义的权限标识，如：replyExport</span>
@@ -125,7 +125,7 @@
             <el-input v-model="editObject.url" placeholder="请输入链接"></el-input>
             <span>点击菜单跳转的页面，如/quarterly/handle/replyExport</span>
           </el-form-item>
-          <el-form-item label="图标">
+          <!--<el-form-item label="图标">
             <i class="fa" :class="editObject.icon">{{editObject.icon}}</i>
             <el-button type="primary" @click="chooseIcon" size="small">选择</el-button>
           </el-form-item>
@@ -135,7 +135,7 @@
               <el-radio label="1">隐藏</el-radio>
             </el-radio-group>
             <span>该菜单或操作是否显示到系统菜单中</span>
-          </el-form-item>
+          </el-form-item>-->
           <el-form-item label="权限标识" prop="permission">
             <el-input v-model="editObject.permission" placeholder="请输入权限标识"></el-input>
             <span>控制器中定义的权限标识，如：replyExport</span>
@@ -233,8 +233,8 @@ export default {
         pId: '',
         name: '',
         url: '',
-        icon: '',
-        hide: '0',
+        // icon: '',
+        // hide: '0',
         permission: '',
         des: ''
       },
@@ -243,8 +243,8 @@ export default {
         pId: '',
         name: '',
         url: '',
-        icon: '',
-        hide: '',
+        // icon: '',
+        // hide: '',
         permission: '',
         des: '',
         sId: ''
@@ -346,8 +346,8 @@ export default {
         pId: '',
         name: '',
         url: '',
-        icon: '',
-        hide: '0',
+        // icon: '',
+        // hide: '0',
         permission: '',
         des: ''
       }
@@ -367,8 +367,8 @@ export default {
             }
             params['name'] = this.addObject.name;
             params['url'] = this.addObject.url;
-            params['icon'] = this.addObject.icon;
-            params['hide'] = this.addObject.hide;
+            // params['icon'] = this.addObject.icon;
+            // params['hide'] = this.addObject.hide;
             params['permission'] = this.addObject.permission;
             params['des'] = this.addObject.des;
             // console.log(params)
@@ -412,8 +412,8 @@ export default {
         pId: '',
         name: '',
         url: '',
-        icon: '',
-        hide: '',
+        // icon: '',
+        // hide: '',
         permission: '',
         des: '',
         sId: ''
@@ -451,8 +451,8 @@ export default {
             }
             params['name'] = this.editObject.name;
             params['url'] = this.editObject.url;
-            params['icon'] = this.editObject.icon;
-            params['hide'] = this.editObject.hide;
+            // params['icon'] = this.editObject.icon;
+            // params['hide'] = this.editObject.hide;
             params['permission'] = this.editObject.permission;
             params['des'] = this.editObject.des;
             //console.log(params)
@@ -489,7 +489,7 @@ export default {
         }
       })
     },
-    // 打开icon
+    /*// 打开icon
     chooseIcon() {
       this.choosePop = true;
     },
@@ -498,7 +498,7 @@ export default {
       this.addObject.icon = item.class;
       this.editObject.icon = item.class;
       this.choosePop = false;
-    },
+    },*/
     // 打开上级菜单模态框
     isBranchPop() {
       this.chooseBranchPop = true;

@@ -22,7 +22,7 @@
           <el-row :gutter="20" style="margin-bottom:20px;">
             <el-col :span="8" class="flex">
               <span class="name">归属机构：</span>
-              <el-select filterable v-model="search.org" clearable placeholder="请选择" @change="getDepartment(search.org)">
+              <el-select filterable v-model="search.org" clearable placeholder="请选择" @change="getDepartmentSearch(search.org)">
                 <el-option
                   v-for="item in OrgOpt"
                   :key="item.id"
@@ -42,13 +42,13 @@
               <div class="el-select" readonly="readonly">
                 <div class="el-input el-input--suffix">
                   <input
-                    v-model="udepartmentName"
+                    v-model="udepartmentNameSearch"
                     type="text"
                     readonly="readonly"
                     autocomplete="off"
                     placeholder="请选择"
                     class="el-input__inner"
-                    @click="choosePop=true"
+                    @click="choosePopSearch=true"
                   >
                   <span class="del-span" @click="delSpan">x</span>
                 </div>
@@ -75,10 +75,11 @@
             <el-table-column prop="utelephone" label="电话" width="130"></el-table-column>
             <el-table-column prop="umobilephone" label="手机"></el-table-column>
             <el-table-column prop="urole" label="角色" width="180"></el-table-column>
-            <el-table-column label="操作" width="100">
+            <el-table-column label="操作" width="130">
               <template slot-scope="scope">
-                <el-button @click="editOpen(scope.row.id)" type="text" size="small">修改</el-button>
-                <el-button @click="del(scope.row.id)" type="text" size="small">删除</el-button>
+                <el-button @click="tranOpen(scope.row.id)" type="text" size="small" v-show="scope.row.utoExamine==0">审核</el-button>
+                <el-button @click="editOpen(scope.row.id)" type="text" size="small" v-show="scope.row.utoExamine==1">修改</el-button>
+                <el-button @click="del(scope.row.id)" type="text" size="small" v-show="scope.row.utoExamine!=0">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -319,19 +320,19 @@
         </el-form>
       </div>
     </el-dialog>
-    <!--选择部门弹层-->
+    <!--搜索选择部门弹层-->
     <el-dialog
       title="选择部门"
-      :visible.sync="choosePop"
+      :visible.sync="choosePopSearch"
       class="choose-pop"
       :close-on-click-modal="false"
     >
       <div class="pop-content">
-        <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+        <el-input placeholder="输入关键字进行过滤" v-model="filterTextSearch"></el-input>
         <el-tree
-          @node-click="chooseNodeClick"
+          @node-click="handleNodeClick"
           class="filter-tree"
-          :data="listOrg"
+          :data="listOrgSearch"
           :props="defaultProps"
           :filter-node-method="filterNode"
           ref="filterTree"
@@ -339,16 +340,75 @@
           :expand-on-click-node="false"
         ></el-tree>
       </div>
+    </el-dialog>
+      <!--新增编辑选择部门弹层-->
+      <el-dialog
+        title="选择部门"
+        :visible.sync="choosePop"
+        class="choose-pop"
+        :close-on-click-modal="false"
+      >
+        <div class="pop-content">
+          <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+          <el-tree
+            @node-click="chooseNodeClick"
+            class="filter-tree"
+            :data="listOrg"
+            :props="defaultProps"
+            :filter-node-method="filterNode"
+            ref="filterTree"
+            :default-expand-all="true"
+            :expand-on-click-node="false"
+          ></el-tree>
+        </div>
       <!--<div class="pop-btn">
         <el-button type="success" @click="confirmChooseBranch">确定</el-button>
         <el-button type="info" @click="choosePop = false">取消</el-button>
       </div>-->
+    </el-dialog>
+    <!--审核弹层-->
+    <el-dialog
+      title="审核"
+      :visible.sync="tranPop"
+      class="choose-pop tran-pop"
+      :close-on-click-modal="false"
+    >
+      <div class="tranbox">
+        <el-row :gutter="20">
+          <el-col :span="12"><div class="tranbox-b"><span>用户名：</span><p>{{tranData.uusername}}</p></div></el-col>
+          <el-col :span="12"><div class="tranbox-b"><span>姓名：</span><p>{{tranData.uname}}</p></div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12"><div class="tranbox-b"><span>所属单位：</span><p>{{tranData.umechanism}}</p></div></el-col>
+          <el-col :span="12"><div class="tranbox-b"><span>部门：</span><p>{{tranData.udepartmentName}}</p></div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="12"><div class="tranbox-b"><span>身份证号：</span><p>{{tranData.uidNumber}}</p></div></el-col>
+          <el-col :span="12"><div class="tranbox-b"><span>手机号：</span><p>{{tranData.umobilephone}}</p></div></el-col>
+        </el-row>
+        <el-row :gutter="20">
+          <el-col :span="24"><div class="tranbox-b tranbox-img"><span>证件照：</span><a @click="openImg" style="cursor: pointer"><img :src="tranData.url" alt=""></a></div></el-col>
+        </el-row>
+
+      </div>
+      <div class="pop-btn" style="text-align: center;">
+        <el-button type="primary" @click="adopt(tranData.id,'1')">通过</el-button>
+        <el-button type="warning" @click="adopt(tranData.id,'2')">不通过</el-button>
+        <el-button type="info" @click="tranPop = false">取消</el-button>
+      </div>
+    </el-dialog>
+    <!--图像弹层-->
+    <el-dialog
+      :visible.sync="imgPop"
+      width="30%">
+      <img :src="tranData.url" alt="" style="width: 100%;">
     </el-dialog>
   </div>
 </template>
 
 <script>
 import md5 from 'js-md5';
+import config from "@/config/config.js";
 export default {
   data() {
     var checkPhone = (rule, value, callback) => {
@@ -386,10 +446,13 @@ export default {
 
     };
     return {
+      imgPop:false,
       loadingBtn : false,
       editPop: false,
       addPop: false,
       choosePop: false,
+      choosePopSearch:false,
+      tranPop:false,
       loading:false,
       OrgOpt: [],
       power: [],
@@ -406,7 +469,10 @@ export default {
       total: 0,
       middleChooseBranch: '',
       filterText: '',
+      filterTextSearch:'',
       udepartmentName: '',
+      udepartmentNameSearch:'',
+      udepartmentIdSearch: '',
       udepartmentId: '',
       addObject: {
         umechanism: '',
@@ -438,6 +504,7 @@ export default {
       },
       tsUserEdit: '0',
       tableData: [],
+      tranData:[],
       rules: {
         uusername: [
           { required: true, message: '姓名必填', trigger: 'blur' },
@@ -481,6 +548,7 @@ export default {
       },
       // 搜索归属部门
       listOrg: [],
+      listOrgSearch:[],
       // 组织机构列表
       listOrgAll: [],
       defaultProps: {
@@ -508,7 +576,9 @@ export default {
       this.pageSize = 10;
       this.search.org = '';
       this.udepartmentId = '';
+      this.udepartmentIdSearch="";
       this.udepartmentName = '';
+      this.udepartmentNameSearch='';
       this.search.loginName = '';
       this.search.Name = '';
     },
@@ -542,7 +612,9 @@ export default {
       this.searchNum = 0;
       this.search.org = '';
       this.udepartmentId = '';
+      this.udepartmentIdSearch = '';
       this.udepartmentName = '';
+      this.udepartmentNameSearch="";
       this.search.loginName = '';
       this.search.Name = '';
       this.OrgTreeClick(data);
@@ -616,11 +688,31 @@ export default {
         }
       })
     },
-    // 加载归属部门
+    // 搜索加载归属部门
+    getDepartmentSearch(id) {
+      // console.log(id)
+      this.udepartmentNameSearch = '';
+      this.udepartmentIdSearch = '';
+      let params = {};
+      params['id'] = id;
+      API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
+        //console.log(res.data)
+        if (res.data.code == 200) {
+          var arr = res.data.data;
+          this.listOrgSearch = this.getOrg(arr);
+          //console.log(this.listOrg)
+        } else if (res.data.code == 1001) {
+          this.signOut();
+        }/*else if(res.data.code == 401){
+            this.$router.push({name: 'auth'})
+          }*/
+      })
+    },
+    // 新增编辑加载归属部门
     getDepartment(id) {
       // console.log(id)
-      this.udepartmentName = '';
-      this.udepartmentId = '';
+      // this.udepartmentName = '';
+      // this.udepartmentId = '';
       let params = {};
       params['id'] = id;
       API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
@@ -663,6 +755,12 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
+          this.loading = false;
         }
       })
     },
@@ -678,7 +776,7 @@ export default {
       this.loading = true;
       let params = {};
       params['uMechanism'] = this.search.org;
-      params['uDepartment'] = this.udepartmentId;
+      params['uDepartment'] = this.udepartmentIdSearch;
       params['uName'] = this.search.loginName;
       params['uUsername'] = this.search.Name;
       params['page'] = this.currentPage;
@@ -701,10 +799,15 @@ export default {
     delSpan(){
       this.udepartmentName = '';
       this.udepartmentId = '';
+      this.udepartmentNameSearch='';
+      this.udepartmentIdSearch='';
     },
     // 搜索部门取值
     handleNodeClick(data) {
-      this.search.branch = data.label;
+      //console.log(data)
+      this.udepartmentNameSearch = data.label;
+      this.udepartmentIdSearch= data.id;
+      this.choosePopSearch = false;
     },
     closeDia(){
       this.udepartmentName = '';
@@ -765,6 +868,7 @@ export default {
               params['uRole'] = this.addObject.urole;
               params['uContent'] = this.addObject.ucontent;
               params['uSpecialUser'] = this.tsUserAdd;
+              params['uToExamine'] = 1;
 
               // console.log(params)
               API.post('/user/create', params, { Authorization: storage.get('Token') }).then((res) => {
@@ -1092,7 +1196,7 @@ export default {
       }).then(() => {
         let params = {};
         params['id'] = id;
-        API.delete('/user/delete', params, { Authorization: storage.get('Token') }).then((res) => {
+        API.post('/user/delete', params, { Authorization: storage.get('Token') }).then((res) => {
           if (res.data.code == 200) {
             this.getPage();
             this.$message({
@@ -1121,14 +1225,54 @@ export default {
       this.choosePop = false;
     },
 
-    /*confirmChooseBranch() {
-      if (this.addPop) {
-        this.form.branch = this.middleChooseBranch;
-      } else {
-        this.search.branch = this.middleChooseBranch;
-      }
-      this.choosePop = false
-    },*/
+    // 图片弹框
+    openImg(){
+      this.imgPop = true;
+    },
+    // 审核通过/不通过
+    adopt(id,exa){
+      let params = {};
+      params['uId'] = id;
+      params['uToExamine'] = exa;
+      API.post('/user/toExamine', params, { Authorization: storage.get('Token') }).then((res) => {
+        console.log(res.data)
+        if (res.data.code == 200) {
+          this.tranPop = false;
+          this.$message({
+            type: 'success',
+            message: res.data.message
+          });
+          this.getPage();
+        } else if (res.data.code == 1001) {
+          this.signOut();
+        } else if (res.data.code == 401) {
+          this.$router.push({ name: 'auth' });
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
+        }
+      })
+    },
+
+    // 审核
+    tranOpen(id){
+      this.tranPop = true;
+      let params = {};
+      params['id'] = id;
+      API.get('/user/examineUser', params, { Authorization: storage.get('Token') }).then((res) => {
+        console.log(res.data)
+        if (res.data.code == 200) {
+          this.tranData = res.data.data;
+          this.tranData.url = config.baseURL + res.data.data.uidPhoto;
+        } else if (res.data.code == 1001) {
+          this.signOut();
+        } else if (res.data.code == 401) {
+          this.$router.push({ name: 'auth' });
+        }
+      })
+    },
     filterNode(value, data) {
       if (!value) return true;
       return data.label.indexOf(value) !== -1;
@@ -1187,7 +1331,10 @@ export default {
   watch: {
     filterText(val) {
       this.$refs.filterTree.filter(val);
-    }
+    },
+    filterTextSearch(val) {
+      this.$refs.filterTree.filter(val);
+    },
   },
   created() {
     this.getPage();
@@ -1199,6 +1346,10 @@ export default {
 };
 </script>
 <style>
+
+  .tran-pop .el-dialog{
+    width: 700px!important;
+  }
   .phoneBox1 {
     float: left;
     width: 90px;
@@ -1274,6 +1425,16 @@ export default {
       }
     }
   }
+  .el-table__row {
+    .cell {
+      button {
+        float: left;
+      }
+      button:nth-of-type(1) {
+        margin-left: 10px;
+      }
+    }
+  }
   .el-dialog__wrapper.tip-dialog {
     .el-dialog {
       margin: 15vh auto !important;
@@ -1289,8 +1450,33 @@ export default {
       .pop-content {
         height: 600px;
       }
+      .tranbox-img {
+        img{
+          width: 200px;
+          margin-left: 15px;
+        }
+      }
+      .tranbox {
+        height: 400px;
+        overflow: hidden;
+        .tranbox-b{
+          height: 40px;
+          line-height: 40px;
+          >span{
+            float: left;
+            display: inline-block;
+            width: 80px;
+            text-align: right;
+          }
+          p {
+            float: left;
+            margin-left: 15px;
+          }
+        }
+      }
     }
   }
+
   .el-radio {
     margin: 0 30px 20px 0;
   }
