@@ -341,7 +341,13 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: "auth" });
+        }else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
+
       });
     },
     //用户菜单树
@@ -358,6 +364,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: "auth" });
+        }else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       });
     },
@@ -388,6 +399,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: "auth" });
+        }else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       });
     },
@@ -537,6 +553,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: "auth" });
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       });
     },
@@ -667,9 +688,12 @@ export default {
           }
         } else if (res.data.code == 1001) {
           this.signOut();
-        } /*else if(res.data.code == 401){
-            this.$router.push({name: 'auth'})
-          }*/
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
+        }
       });
     },
     // 分配按钮点击
@@ -692,6 +716,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: "auth" });
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       });
     },
@@ -726,6 +755,11 @@ export default {
             this.signOut();
           } else if (res.data.code == 401) {
             this.$router.push({ name: "auth" });
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.data.message
+            });
           }
         });
       } else {
@@ -744,6 +778,11 @@ export default {
             this.signOut();
           } else if (res.data.code == 401) {
             this.$router.push({ name: "auth" });
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.data.message
+            });
           }
         });
       }

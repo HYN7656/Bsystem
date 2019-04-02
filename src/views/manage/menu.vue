@@ -303,6 +303,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       })
     },
@@ -329,6 +334,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       })
     },
@@ -433,6 +443,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       })
     },

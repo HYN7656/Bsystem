@@ -145,7 +145,14 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        }  else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
+          this.loading = false;
         }
+
       })
     },
 
@@ -190,6 +197,12 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        }  else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
+          this.loading = false;
         }
       })
     },
@@ -230,10 +243,10 @@ export default {
           } else if(res.data.code == 1001){
             this.signOut();
           } else {
-            this.$message({
-              type: 'error',
-              message: '删除失败!'
-            });
+              this.$message({
+                type: 'error',
+                message:"删除失败"+ res.data.message
+              });
           }
         });
       });

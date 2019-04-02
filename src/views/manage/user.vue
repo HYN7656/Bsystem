@@ -516,20 +516,20 @@ export default {
         ],
         upasswd: [
           { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 6, message: '长度至少6位', trigger: 'blur' }
+          { min: 6,max:30, message: '长度在 6 到 30 个字符之间', trigger: 'blur' },
         ],
         confirmPas: [
           { validator: validatePass2, trigger: 'blur' },
           { required: true, message: '请再次输入密码', trigger: 'blur' },
-          { min: 6, message: '长度至少6位', trigger: 'blur' }
+          { min: 6,max:30, message: '长度在 6 到 30 个字符之间', trigger: 'blur' },
         ],
         ResetPasswd: [
-          { min: 6, message: '长度至少6位', trigger: 'blur' }
+          { min: 6,max:30, message: '长度在 6 到 30 个字符之间', trigger: 'blur' },
         ],
         confirmPas1: [
           { validator: validatePass3, trigger: 'blur' },
           // { required: true, message: '请再次输入密码', trigger: 'blur' },
-          { min: 6, message: '长度至少6位', trigger: 'blur' }
+          { min: 6,max:30, message: '长度在 6 到 30 个字符之间', trigger: 'blur' },
         ],
         uemail: [
           { required: true, message: '邮箱必填', trigger: 'blur' },
@@ -602,6 +602,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        }else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       })
     },
@@ -645,6 +650,11 @@ export default {
             this.signOut();
           } else if (res.data.code == 401) {
             this.$router.push({ name: 'auth' });
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.data.message
+            });
           }
         })
       } else {
@@ -664,6 +674,11 @@ export default {
             this.signOut();
           } else if (res.data.code == 401) {
             this.$router.push({ name: 'auth' });
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.data.message
+            });
           }
         })
       }
@@ -685,28 +700,39 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        }else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       })
     },
     // 搜索加载归属部门
     getDepartmentSearch(id) {
-      // console.log(id)
       this.udepartmentNameSearch = '';
       this.udepartmentIdSearch = '';
-      let params = {};
-      params['id'] = id;
-      API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
-        //console.log(res.data)
-        if (res.data.code == 200) {
-          var arr = res.data.data;
-          this.listOrgSearch = this.getOrg(arr);
-          //console.log(this.listOrg)
-        } else if (res.data.code == 1001) {
-          this.signOut();
-        }/*else if(res.data.code == 401){
-            this.$router.push({name: 'auth'})
-          }*/
-      })
+      if(id){
+        let params = {};
+        params['id'] = id;
+        API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
+          //console.log(res.data)
+          if (res.data.code == 200) {
+            var arr = res.data.data;
+            this.listOrgSearch = this.getOrg(arr);
+            //console.log(this.listOrg)
+          } else if (res.data.code == 1001) {
+            this.signOut();
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.data.message
+            });
+          }
+        })
+      }else {
+        this.listOrgSearch = [];
+      }
     },
     // 新增编辑加载归属部门
     getDepartment(id) {
@@ -723,9 +749,12 @@ export default {
           //console.log(this.listOrg)
         } else if (res.data.code == 1001) {
           this.signOut();
-        }/*else if(res.data.code == 401){
-            this.$router.push({name: 'auth'})
-          }*/
+        }else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
+        }
       })
     },
     // 转换树结构
@@ -792,6 +821,12 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        }else {
+          this.loading = false;
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       })
     },
@@ -986,6 +1021,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        }else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       })
     },
@@ -1270,6 +1310,11 @@ export default {
           this.signOut();
         } else if (res.data.code == 401) {
           this.$router.push({ name: 'auth' });
+        }else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
         }
       })
     },
@@ -1311,7 +1356,6 @@ export default {
         this.getSearch();
         // alert('点击了左侧同时点击了搜索')
       }
-
     },
 
     signOut() {
