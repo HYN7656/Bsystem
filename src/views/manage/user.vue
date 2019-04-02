@@ -1092,7 +1092,7 @@ export default {
                   //console.log(res.data)
                   if (res.data.code == 200) {
                     this.editPop = false;
-                    this.getPage();
+                    this.getSearch();
                     this.$message({
                       type: 'success',
                       message: '编辑成功，重新登录系统生效!'
@@ -1168,7 +1168,7 @@ export default {
                       //console.log(res.data)
                       if (res.data.code == 200) {
                         this.editPop = false;
-                        this.getPage();
+                        this.getSearch();
                         this.$message({
                           type: 'success',
                           message: '编辑成功!'
