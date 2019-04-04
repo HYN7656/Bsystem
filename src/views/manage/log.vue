@@ -41,7 +41,7 @@
                 :picker-options="pickerOptions"
               ></el-date-picker>
               <span style="margin-left: 30px;line-height: 38px;">
-                <el-checkbox v-model="search.normal" true-label="1" false-label="0">只查询异常信息</el-checkbox>
+                <el-checkbox v-model="search.normal" true-label="1" false-label="">只查询异常信息</el-checkbox>
               </span>
             </el-col>
             <el-col :span="3" class="flex">
@@ -108,7 +108,7 @@ export default {
         url: '',
         dateStart: '',
         dateEnd: '',
-        normal: 0
+        normal: ''
       },
       tableData: [],
       loading : false,

@@ -719,7 +719,7 @@ export default {
           //console.log(res.data)
           if (res.data.code == 200) {
             var arr = res.data.data;
-            this.listOrgSearch = this.getOrg(arr);
+            this.listOrgSearch = this.getOrg(arr[0].childnode);
             //console.log(this.listOrg)
           } else if (res.data.code == 1001) {
             this.signOut();
@@ -737,25 +737,31 @@ export default {
     // 新增编辑加载归属部门
     getDepartment(id) {
       // console.log(id)
-      // this.udepartmentName = '';
-      // this.udepartmentId = '';
-      let params = {};
-      params['id'] = id;
-      API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
-        //console.log(res.data)
-        if (res.data.code == 200) {
-          var arr = res.data.data;
-          this.listOrg = this.getOrg(arr);
-          //console.log(this.listOrg)
-        } else if (res.data.code == 1001) {
-          this.signOut();
-        }else {
-          this.$message({
-            type: 'error',
-            message: res.data.message
-          });
-        }
-      })
+      this.udepartmentName = '';
+      this.udepartmentId = '';
+      if(id){
+        let params = {};
+        params['id'] = id;
+        API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
+          //console.log(res.data)
+          if (res.data.code == 200) {
+            var arr = res.data.data;
+            this.listOrg = this.getOrg(arr[0].childnode);
+            //console.log(this.listOrg)
+          } else if (res.data.code == 1001) {
+            this.signOut();
+          }else {
+            this.$message({
+              type: 'error',
+              message: res.data.message
+            });
+          }
+        })
+      }else {
+        this.listOrg = [];
+      }
+
+
     },
     // 转换树结构
     getOrg(list) {

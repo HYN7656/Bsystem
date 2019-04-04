@@ -26,12 +26,12 @@
           <el-table :data="tableData" border style="width: 100%" max-height="600">
             <el-table-column prop="name" label="名称" width="200"></el-table-column>
             <el-table-column prop="url" label="链接"></el-table-column>
-            <el-table-column prop="hide" label="可见" width="140">
+            <!--<el-table-column prop="hide" label="可见" width="140">
               <template slot-scope="scope">
                 <span v-if="scope.row.hide=='0'">显示</span>
                 <span v-if="scope.row.hide=='1'">隐藏</span>
               </template>
-            </el-table-column>
+            </el-table-column>-->
             <el-table-column prop="permission" label="权限标识" width="240"></el-table-column>
             <el-table-column label="操作" width="140">
               <template slot-scope="scope">

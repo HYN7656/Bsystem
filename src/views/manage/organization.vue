@@ -130,7 +130,7 @@
                   autocomplete="off"
                   placeholder="请选择"
                   class="el-input__inner"
-                  @click="choosePop = true"
+                  @click="chooseEditPop = true"
                 >
                 <span class="del-span" @click="delSpan">x</span>
               </div>
@@ -193,6 +193,27 @@
         ></el-tree>
       </div>
     </el-dialog>
+    <!--编辑部门弹层-->
+    <el-dialog
+      title="选择部门"
+      :visible.sync="chooseEditPop"
+      class="choose-branch-pop"
+      :close-on-click-modal="false"
+    >
+      <div class="pop-content">
+        <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+        <el-tree
+          @node-click="chooseNodeClick"
+          class="filter-tree"
+          :data="listEditOrg"
+          :props="defaultProps"
+          :filter-node-method="filterNode"
+          ref="filterTree"
+          :default-expand-all="true"
+          :expand-on-click-node="false"
+        ></el-tree>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -200,6 +221,7 @@
 export default {
   data() {
     return {
+      chooseEditPop:false,
       sjjg:false,
       loadingBtn : false,
       filterText: '',
@@ -212,6 +234,7 @@ export default {
       tableData: [],
       // 机构树容器
       listOrg: [],
+      listEditOrg:[],
       // 树默认
       defaultProps: {
         children: 'children',
@@ -297,6 +320,28 @@ export default {
         }
       })
     },
+    getEditTree(id){
+      let params = {};
+      params['id'] = id;
+      API.get('/mechanism/findTreeById', params, { Authorization: storage.get('Token') }).then((res) => {
+        // console.log(res.data)
+        if (res.data.code == 200) {
+          var arr = res.data.data;
+          this.listEditOrg= this.getOrg(arr);
+          // console.log(this.listOrg)
+        } else if (res.data.code == 1001) {
+          this.signOut();
+        } else if (res.data.code == 401) {
+          this.$router.push({ name: 'auth' });
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.data.message
+          });
+        }
+      })
+
+    },
     // 点击左侧树展示列表翻页器控制
     getPageCount(data){
       this.pageSize = 10;
@@ -311,6 +356,7 @@ export default {
       this.OrgName = data.label;
       this.OrgId = data.id;
       this.choosePop = false;
+      this.chooseEditPop = false;
     },
     // 通过左侧树选择后展示右侧列表
     getAllTreeList(data) {
@@ -474,6 +520,7 @@ export default {
       }
       this.OrgId = 0;
       this.OrgName = '';
+      this.listEditOrg=[];
       let params = {};
       params['id'] = id;
       API.get('/mechanism/findOneById', params, { Authorization: storage.get('Token') }).then((res) => {
@@ -491,6 +538,7 @@ export default {
           // 机构显示名称
           this.OrgName = obj.superiorName;
           this.OrgId = obj.mid;
+          this.getEditTree(this.OrgId)
         } else if (res.data.code == 1001) {
           this.signOut();
         } else if (res.data.code == 401) {
@@ -571,7 +619,7 @@ export default {
       }).then(() => {
         let params = {};
         params['id'] = id;
-        API.delete('/mechanism/delete', params, { Authorization: storage.get('Token') }).then((res) => {
+        API.post('/mechanism/delete', params, { Authorization: storage.get('Token') }).then((res) => {
           if (res.data.code == 200) {
             this.getPage();
             this.$message({
