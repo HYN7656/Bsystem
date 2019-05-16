@@ -560,7 +560,8 @@ export default {
       UName : '',
       PageContID : '',
       phoneNum:'',
-      searchNum : 0
+      searchNum : 0,
+      UPhone:''
 
     };
   },
@@ -992,6 +993,7 @@ export default {
           this.editObject = res.data.data;
           this.phoneNum = res.data.data.umobilephone;
           this.UName = this.editObject.uname;
+          this.UPhone =this.editObject.umobilephone;
           this.tsUserEdit = res.data.data.uspecialUser.toString();
           var obj = res.data.data;
           if (obj.urole) {
@@ -1048,7 +1050,7 @@ export default {
         this.$refs[formName].validate((valid) => {
           if (valid) {
             // 判断编辑的用户名是否有改变，如果无改变正常请求，如果有改变则请求后台接口判断是否重名
-            if(this.UName == this.editObject.uname){
+            if(this.UName == this.editObject.uname && this.UPhone == this.editObject.umobilephone){
               // 控制每个按钮只能点击一次
               this.num ++;
               if(this.num == 1) {
@@ -1119,10 +1121,97 @@ export default {
             }else {
               return;
               }
-            }else {
+            }else if(this.UName != this.editObject.uname) {
               var name = {};
               name['name'] = this.editObject.uname;
               API.get('/user/shiroByName', name, {Authorization: storage.get('Token')}).then((res) => {
+                if (res.data.code == 200) {
+                  // 控制每个按钮只能点击一次
+                  this.num ++;
+                  if(this.num == 1) {
+                    this.loadingBtn = true;
+                    let params = {};
+                    params['uId'] = this.editObject.id;
+                    params['uMechanism'] = this.editObject.umechanism;
+                    params['uDepartment'] = this.udepartmentId;
+                    params['uUsername'] = this.editObject.uusername;
+                    params['uName'] = this.editObject.uname;
+                    if (this.editObject.ResetPasswd) {
+                      params['uPasswd'] = md5(this.editObject.uname + this.editObject.ResetPasswd);
+                    } else {
+                      params['uPasswd'] = this.editObject.ResetPasswd;
+                    }
+                    params['uEmail'] = this.editObject.uemail;
+                    params['uTelephone'] = this.editObject.utelephone;
+                    let phone = '';
+                    const reg = /^1[3|4|5|7|8][0-9]\d{8}$/;
+                    if(this.editObject.umobilephone == ''){
+                      this.$message({
+                        type: 'error',
+                        message: '手机号必填'
+                      });
+                      this.loadingBtn = false;
+                      this.num = 0;
+                      return;
+                    }else if(this.editObject.umobilephone == this.phoneNum) {
+                      phone = '';
+                    }else if(!reg.test(this.editObject.umobilephone)){
+                      this.$message({
+                        type: 'error',
+                        message: '请输入正确手机号'
+                      });
+                      this.loadingBtn = false;
+                      this.num = 0;
+                      return;
+                    }else {
+                      phone = this.editObject.umobilephone;
+                    }
+                    params['uMobilephone'] = phone;
+                    params['uRole'] = this.editObject.urole;
+
+                    params['uContent'] = this.editObject.ucontent;
+                    params['uSpecialUser'] = this.tsUserEdit;
+                    // console.log(params)
+                    API.post('/user/update', params, { Authorization: storage.get('Token') }).then((res) => {
+                      //console.log(res.data)
+                      if (res.data.code == 200) {
+                        this.editPop = false;
+                        this.getSearch();
+                        this.$message({
+                          type: 'success',
+                          message: '编辑成功!'
+                        });
+                      } else if (res.data.code == 1001) {
+                        this.signOut();
+                      } else if (res.data.code == 401) {
+                        this.$router.push({ name: 'auth' });
+                      } else {
+                        this.$message({
+                          type: 'error',
+                          message: '编辑失败!'+ res.data.message
+                        });
+                        this.loadingBtn = false;
+                        this.num = 0;
+                      }
+                    })
+                  }else {
+                    return;
+                  }
+                }else if (res.data.code == 1001) {
+                  this.signOut();
+                } else {
+                  this.$message({
+                    type: 'error',
+                    message: '编辑失败!' + res.data.message
+                  });
+                  this.loadingBtn = false;
+                  this.num = 0;
+                }
+              })
+            } else if(this.UPhone != this.editObject.umobilephone){
+              var phone = {};
+              phone['phone']=this.editObject.umobilephone;
+              API.get('/user/findByPhone', phone, {Authorization: storage.get('Token')}).then((res) => {
                 if (res.data.code == 200) {
                   // 控制每个按钮只能点击一次
                   this.num ++;
